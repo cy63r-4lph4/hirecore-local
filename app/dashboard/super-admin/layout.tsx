@@ -1,22 +1,16 @@
+// app/dashboard/super-admin/layout.tsx
 import type { ReactNode } from "react";
-import AdminLayoutClient from "../admin/layout-client";
+import DashboardLayoutClient from "../layout-client";
 
-const superAdminNavItems = [
-  {
-    href: "/dashboard/super-admin",
-    label: "Overview",
-    iconName: "layout",
-  },
+const navItems = [
+  { href: "/dashboard/super-admin", label: "Overview", iconName: "layout" },
+  { href: "/dashboard/super-admin/users", label: "Users", iconName: "users" },
   {
     href: "/dashboard/super-admin/admins",
     label: "Admins",
-    iconName: "admin",
+    iconName: "shield",
   },
-  {
-    href: "/dashboard/super-admin/tasks",
-    label: "Tasks",
-    iconName: "tasks",
-  },
+  { href: "/dashboard/super-admin/tasks", label: "Tasks", iconName: "tasks" },
   {
     href: "/dashboard/super-admin/applications",
     label: "Applications",
@@ -28,26 +22,29 @@ const superAdminNavItems = [
     iconName: "users",
   },
   {
+    href: "/dashboard/super-admin/uploads",
+    label: "Uploads",
+    iconName: "upload",
+  },
+  {
     href: "/dashboard/super-admin/security",
     label: "Security",
     iconName: "shield",
   },
 ] as const;
 
-const demoProfile = {
-  role: "super_admin",
-  full_name: "Super Admin",
-  email: "superadmin@hirecore.local",
-};
-
-export default function SuperAdminLayout({ children }: { children: ReactNode }) {
+export default function SuperAdminLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   return (
-    <AdminLayoutClient
-      navItems={superAdminNavItems}
-      profile={demoProfile}
-      dashboardType="super-admin"
+    <DashboardLayoutClient
+      navItems={navItems}
+      title="Super Admin"
+      subtitle="System governance and control"
     >
       {children}
-    </AdminLayoutClient>
+    </DashboardLayoutClient>
   );
 }
