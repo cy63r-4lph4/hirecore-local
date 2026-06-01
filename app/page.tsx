@@ -6,13 +6,67 @@ import { motion, cubicBezier } from "framer-motion";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import Hero from "@/components/shared/hero";
 import SectionDivider from "@/components/shared/section-divider";
-
+import {
+  Leaf,
+  Hammer,
+  Zap,
+  Bike,
+  HeartHandshake,
+  Shirt,
+  Car,
+  ChefHat,
+  Paintbrush,
+  Wrench,
+} from "lucide-react";
+import { InfiniteScroller } from "@/components/shared/infinite-scroller";
 const fadeUp = {
   initial: { opacity: 0, y: 40 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: "-80px" },
   transition: { duration: 0.8, ease: cubicBezier(0.22, 1, 0.36, 1) },
 };
+
+const WORK_TYPES = [
+  {
+    name: "Gardener",
+    image: "/images/work-types/gardener.jpeg",
+  },
+  {
+    name: "Carpenter",
+    image: "/images/work-types/carpenter.jpeg",
+  },
+  {
+    name: "Electrician",
+    image: "/images/work-types/electrician.jpeg",
+  },
+  {
+    name: "Delivery Rider",
+    image: "/images/work-types/delivery-rider.jpeg",
+  },
+  {
+    name: "Caretaker",
+    image: "/images/work-types/caretaker.jpeg",
+  },
+  {
+    name: "Seamstress",
+    image: "/images/work-types/seamstress.jpeg",
+  },
+  {
+    name: "Driver",
+    image: "/images/work-types/driver.jpeg",
+  },
+  {
+    name: "Cook",
+    image: "/images/work-types/cook.jpeg",
+  },
+];
+
+const STATS: [string, string][] = [
+  ["12,480", "Active workers"],
+  ["1,204", "Live tasks"],
+  ["9,301", "Matches today"],
+  ["97%", "Completion rate"],
+];
 
 export default function HomePage() {
   return (
@@ -25,25 +79,64 @@ export default function HomePage() {
       <section className="relative bg-surface px-6 py-28 text-center">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,hsl(var(--primary)/0.08),transparent_45%)]" />
 
-        <div className="relative mx-auto grid max-w-5xl grid-cols-2 gap-8 md:grid-cols-4">
-          {[
-            ["12,480", "Active workers"],
-            ["1,204", "Live tasks"],
-            ["9,301", "Matches today"],
-            ["97%", "Completion rate"],
-          ].map(([v, l]) => (
+        <div className="relative mx-auto mb-10 max-w-3xl">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-primary">
+            Local skills, ready when needed
+          </p>
+          <h2 className="text-3xl font-black tracking-tight text-foreground md:text-5xl">
+            Find trusted hands for everyday work
+          </h2>
+        </div>
+
+        <InfiniteScroller speed="slow" className="relative mx-auto max-w-6xl">
+          {WORK_TYPES.map((type, index) => (
             <motion.div
-              key={l}
+              key={type.name}
               {...fadeUp}
-              className="rounded-3xl border border-border bg-card/70 p-6 shadow-sm backdrop-blur-xl"
+              className="group w-55 shrink-0 overflow-hidden rounded-3xl border border-border bg-card/70 shadow-sm backdrop-blur-xl transition hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
             >
-              <div className="text-3xl font-black tracking-tight text-foreground md:text-4xl">
-                {v}
+              <div className="relative h-60 w-full overflow-hidden">
+                <Image
+                  src={type.image}
+                  alt={type.name}
+                  fill
+                  priority={index === 0}
+                  sizes="220px"
+                  className="object-cover transition duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent" />
               </div>
-              <div className="mt-2 text-sm text-muted-foreground">{l}</div>
+
+              <div className="p-4 text-left">
+                <h3 className="text-sm font-black text-foreground">
+                  {type.name}
+                </h3>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Verified local skill
+                </p>
+              </div>
             </motion.div>
           ))}
-        </div>
+        </InfiniteScroller>
+
+        {STATS.length > 0 && (
+          <div className="relative mx-auto mt-14 grid max-w-5xl grid-cols-2 gap-4 md:grid-cols-4">
+            {STATS.map(([value, label]) => (
+              <motion.div
+                key={label}
+                {...fadeUp}
+                className="rounded-3xl border border-border bg-card/70 p-5 shadow-sm backdrop-blur-xl"
+              >
+                <div className="text-2xl font-black tracking-tight text-foreground md:text-3xl">
+                  {value}
+                </div>
+                <div className="mt-2 text-xs text-muted-foreground">
+                  {label}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </section>
 
       <SectionDivider flip />
@@ -96,16 +189,17 @@ export default function HomePage() {
         <div className="relative mx-auto grid max-w-6xl items-center gap-16 md:grid-cols-2">
           <motion.div
             {...fadeUp}
-            className="relative h-[420px] overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl"
+            className="relative h-105 overflow-hidden rounded-4xl border border-white/10 shadow-2xl"
           >
             <Image
               src="/images/delivery-guy.jpeg"
               alt="Verified worker completing a local task"
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
             />
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/45 via-transparent to-transparent" />
           </motion.div>
 
           <motion.div {...fadeUp}>

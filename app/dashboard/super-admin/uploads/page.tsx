@@ -179,8 +179,7 @@ function UploadCard({ upload }: { upload: SuperAdminUpload }) {
         </div>
 
         <Link
-          href={`/api/uploads/${upload.id}/view`}
-          target="_blank"
+          href={`/dashboard/super-admin/uploads/${upload.id}`}
           className="shrink-0 text-[10px] font-black uppercase tracking-widest text-primary hover:underline"
         >
           View Asset
@@ -280,7 +279,11 @@ export default function SuperAdminUploadsPage() {
           { label: "Total Assets", val: totalUploads, icon: Activity },
           { label: "Profile Images", val: profileImages, icon: ImageIcon },
           { label: "Job Files", val: jobAttachments, icon: Briefcase },
-          { label: "Workforce Apps", val: workforceAttachments, icon: ShieldCheck },
+          {
+            label: "Workforce Apps",
+            val: workforceAttachments,
+            icon: ShieldCheck,
+          },
           { label: "Workforce Docs", val: workforceDocs, icon: Paperclip },
         ].map((stat, index) => (
           <div
@@ -416,7 +419,9 @@ export default function SuperAdminUploadsPage() {
             <Button
               variant="outline"
               className="rounded-xl border-border bg-background/50 text-[10px] font-black uppercase tracking-widest"
-              disabled={loading || !meta || page >= Math.max(1, meta.totalPages)}
+              disabled={
+                loading || !meta || page >= Math.max(1, meta.totalPages)
+              }
               onClick={() => setPage((current) => current + 1)}
             >
               Next

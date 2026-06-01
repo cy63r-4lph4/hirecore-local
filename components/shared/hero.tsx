@@ -154,29 +154,7 @@ export default function Hero() {
           </Link>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.48, duration: 0.8 }}
-          className="mx-auto mt-14 grid max-w-3xl gap-3 sm:grid-cols-3"
-        >
-          {[
-            ["12k+", "verified workers", ShieldCheck] as const,
-            ["Near you", "local matching", MapPin] as const,
-            ["Escrow", "safer payments", Sparkles] as const,
-          ].map(([value, label, Icon]) => (
-            <div
-              key={label as string}
-              className="rounded-2xl border border-white/10 bg-white/8 px-5 py-4 text-left backdrop-blur-2xl"
-            >
-              <Icon className="mb-3 h-5 w-5 text-primary" />
-              <div className="text-lg font-black">{value}</div>
-              <div className="text-sm text-section-dark-foreground/60">
-                {label}
-              </div>
-            </div>
-          ))}
-        </motion.div>
+       
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />

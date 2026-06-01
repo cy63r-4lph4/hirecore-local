@@ -1,7 +1,16 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: 36 42% 97%;
+  /*
+    HireCore Local Theme
+    Keep all color tokens as raw HSL channels because the app uses:
+    hsl(var(--token))
+  */
+
+  --background: 180 45% 98%;
   --foreground: 184 22% 10%;
 
   --surface: 0 0% 100%;
@@ -17,26 +26,44 @@
   --card: 0 0% 100%;
   --card-foreground: 184 22% 10%;
 
-  --primary: 174 66% 42%;
-  --primary-foreground: 0 0% 100%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 184 22% 10%;
 
-  --secondary: 91 82% 62%;
-  --secondary-foreground: 184 28% 9%;
+  --primary: 165 70% 42%;
+  --primary-foreground: 180 45% 98%;
 
-  --muted: 165 25% 91%;
-  --muted-foreground: 184 12% 38%;
+  --secondary: 165 38% 94%;
+  --secondary-foreground: 184 22% 10%;
 
-  --accent: 178 52% 92%;
-  --accent-foreground: 176 68% 30%;
+  --muted: 165 28% 92%;
+  --muted-foreground: 185 14% 42%;
 
-  --destructive: 0 84% 60%;
+  --accent: 91 82% 62%;
+  --accent-foreground: 184 22% 10%;
+
+  --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 170 25% 84%;
-  --input: 170 25% 84%;
-  --ring: 174 66% 42%;
+  --border: 174 24% 84%;
+  --input: 174 24% 84%;
+  --ring: 165 70% 42%;
 
-  --radius: 1rem;
+  --radius: 0.625rem;
+
+  --chart-1: 165 70% 42%;
+  --chart-2: 190 78% 48%;
+  --chart-3: 91 82% 62%;
+  --chart-4: 174 66% 42%;
+  --chart-5: 188 36% 24%;
+
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 184 22% 10%;
+  --sidebar-primary: 165 70% 42%;
+  --sidebar-primary-foreground: 180 45% 98%;
+  --sidebar-accent: 165 38% 94%;
+  --sidebar-accent-foreground: 184 22% 10%;
+  --sidebar-border: 174 24% 84%;
+  --sidebar-ring: 165 70% 42%;
 
   --gradient-brand: linear-gradient(
     135deg,
@@ -50,17 +77,19 @@
     radial-gradient(circle at 82% 12%, hsl(190 78% 48% / 0.18), transparent 40%),
     radial-gradient(circle at 50% 90%, hsl(165 70% 52% / 0.12), transparent 45%);
 
-  --shadow-card: 0 18px 35px -28px rgb(7 25 28 / 0.45),
+  --shadow-card:
+    0 18px 35px -28px rgb(7 25 28 / 0.45),
     inset 0 1px 0 rgb(255 255 255 / 0.75);
 
-  --shadow-lift: 0 38px 55px -35px hsl(174 66% 42% / 0.42),
+  --shadow-lift:
+    0 38px 55px -35px hsl(174 66% 42% / 0.42),
     0 4px 20px -10px rgb(9 42 46 / 0.22);
 
   --glow-primary: 0 0 42px hsl(var(--primary) / 0.32);
 }
 
 .dark {
-  --background: 190 44% 7%;
+  --background: 190 48% 5%;
   --foreground: 165 45% 96%;
 
   --surface: 188 36% 11%;
@@ -76,24 +105,42 @@
   --card: 188 36% 11%;
   --card-foreground: 165 45% 96%;
 
-  --primary: 172 72% 52%;
-  --primary-foreground: 190 44% 7%;
+  --popover: 188 36% 11%;
+  --popover-foreground: 165 45% 96%;
 
-  --secondary: 91 82% 62%;
-  --secondary-foreground: 184 28% 9%;
+  --primary: 165 70% 52%;
+  --primary-foreground: 190 48% 5%;
 
-  --muted: 188 28% 17%;
-  --muted-foreground: 170 14% 72%;
+  --secondary: 188 32% 15%;
+  --secondary-foreground: 165 45% 96%;
 
-  --accent: 178 34% 18%;
-  --accent-foreground: 172 72% 62%;
+  --muted: 188 28% 16%;
+  --muted-foreground: 174 18% 68%;
 
-  --destructive: 0 72% 55%;
+  --accent: 91 82% 62%;
+  --accent-foreground: 190 48% 5%;
+
+  --destructive: 0 72% 58%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 184 26% 22%;
-  --input: 184 26% 22%;
-  --ring: 172 72% 52%;
+  --border: 188 24% 20%;
+  --input: 188 24% 20%;
+  --ring: 165 70% 52%;
+
+  --chart-1: 165 70% 52%;
+  --chart-2: 190 78% 50%;
+  --chart-3: 91 82% 62%;
+  --chart-4: 174 66% 52%;
+  --chart-5: 165 45% 78%;
+
+  --sidebar: 188 36% 11%;
+  --sidebar-foreground: 165 45% 96%;
+  --sidebar-primary: 165 70% 52%;
+  --sidebar-primary-foreground: 190 48% 5%;
+  --sidebar-accent: 188 32% 15%;
+  --sidebar-accent-foreground: 165 45% 96%;
+  --sidebar-border: 188 24% 20%;
+  --sidebar-ring: 165 70% 52%;
 
   --gradient-brand: linear-gradient(
     135deg,
@@ -106,6 +153,16 @@
     radial-gradient(circle at 18% 18%, hsl(91 82% 62% / 0.12), transparent 42%),
     radial-gradient(circle at 82% 12%, hsl(190 78% 50% / 0.16), transparent 40%),
     radial-gradient(circle at 50% 90%, hsl(172 72% 52% / 0.1), transparent 45%);
+
+  --shadow-card:
+    0 18px 35px -28px rgb(0 0 0 / 0.65),
+    inset 0 1px 0 rgb(255 255 255 / 0.06);
+
+  --shadow-lift:
+    0 38px 55px -35px hsl(174 66% 42% / 0.32),
+    0 4px 20px -10px rgb(0 0 0 / 0.45);
+
+  --glow-primary: 0 0 42px hsl(var(--primary) / 0.28);
 }
 
 @theme inline {
@@ -125,6 +182,9 @@
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
 
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
 
@@ -143,10 +203,32 @@
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
-}
 
-* {
-  border-color: hsl(var(--border));
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+  --font-heading: var(--font-sans);
+  --font-sans: var(--font-sans);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 html,
@@ -161,6 +243,10 @@ body {
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+* {
+  border-color: hsl(var(--border));
 }
 
 .glass-nav {
@@ -201,4 +287,29 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+@keyframes scroll {
+  to {
+    transform: translateX(calc(-50% - 0.75rem));
+  }
+}
+
+.animate-scroll {
+  animation: scroll var(--animation-duration, 120s)
+    var(--animation-direction, forwards) linear infinite;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
 }

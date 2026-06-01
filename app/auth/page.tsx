@@ -8,21 +8,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   ArrowRight,
-  BadgeCheck,
   BriefcaseBusiness,
   Building2,
-  CheckCircle2,
+  Check,
   Eye,
   EyeOff,
-  HandCoins,
   Loader2,
   Lock,
   Mail,
   Phone,
-  ShieldCheck,
   Sparkles,
   UserRound,
-  Users,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -30,8 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 type AccountType = "WORKER" | "EMPLOYER";
 
@@ -41,10 +36,6 @@ type AuthResponse = {
     email: string;
     fullName: string;
     accountTypes?: AccountType[];
-    capabilities?: {
-      isWorker?: boolean;
-      isEmployer?: boolean;
-    };
   };
   tokens?: {
     accessToken?: string;
@@ -60,52 +51,19 @@ const accountTypeCards: Array<{
   title: string;
   description: string;
   icon: React.ElementType;
-  highlight: string;
 }> = [
   {
     value: "WORKER",
-    title: "I want to find work",
-    description:
-      "Discover local jobs, apply with confidence, and build a visible work profile.",
+    title: "Find Opportunities",
+    description: "Apply for local jobs and build a verified profile.",
     icon: BriefcaseBusiness,
-    highlight: "Worker",
   },
   {
     value: "EMPLOYER",
-    title: "I want to hire people",
-    description:
-      "Post opportunities, review applications, and reach local talent faster.",
+    title: "Hire Local Talent",
+    description: "Post projects, filter applicants, and source teams.",
     icon: Building2,
-    highlight: "Employer",
   },
-];
-
-const platformBenefits = [
-  {
-    title: "Jobs that feel closer",
-    description:
-      "HireCore Local connects people to practical opportunities around them, not vague listings floating in the void.",
-    icon: BriefcaseBusiness,
-  },
-  {
-    title: "Hiring with more signal",
-    description:
-      "Employers gain clearer candidate profiles, application visibility, and a structured path to trustworthy assignments.",
-    icon: ShieldCheck,
-  },
-  {
-    title: "One account, multiple paths",
-    description:
-      "A user can be a worker, employer, or both. The platform bends around real life instead of forcing one label.",
-    icon: Users,
-  },
-];
-
-const workforceBenefits = [
-  "Access a stronger, verified worker identity.",
-  "Stand out for HireCore-assigned opportunities.",
-  "Support document-backed trust during verification.",
-  "Build credibility beyond a single job application.",
 ];
 
 export default function LoginPage() {
@@ -121,51 +79,29 @@ export default function LoginPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [accountTypes, setAccountTypes] = useState<AccountType[]>([]);
 
-  const authTitle = isSignup
-    ? "Create your HireCore identity"
-    : "Welcome back to HireCore";
-
-  const authDescription = isSignup
-    ? "Choose how you want to move through the platform, then step in."
-    : "Sign in and continue where your work, hiring, and momentum paused.";
-
   const selectedAccountTypeLabel = useMemo(() => {
-    if (accountTypes.length === 2) return "Worker + Employer";
-    if (accountTypes[0] === "WORKER") return "Worker";
-    if (accountTypes[0] === "EMPLOYER") return "Employer";
-    return "No account path selected";
+    if (accountTypes.length === 2) return "Dual-Role Account";
+    if (accountTypes[0] === "WORKER") return "Worker Profile";
+    if (accountTypes[0] === "EMPLOYER") return "Employer Profile";
+    return "Select profile path";
   }, [accountTypes]);
 
   const toggleAccountType = (value: AccountType) => {
-    setAccountTypes((current) => {
-      if (current.includes(value)) {
-        return current.filter((item) => item !== value);
-      }
-
-      return [...current, value];
-    });
+    setAccountTypes((current) =>
+      current.includes(value)
+        ? current.filter((item) => item !== value)
+        : [...current, value]
+    );
   };
 
   const persistAuth = (data: AuthResponse) => {
-    const accessToken =
-      data.tokens?.accessToken ?? data.accessToken;
-    const refreshToken =
-      data.tokens?.refreshToken ?? data.refreshToken;
-
-    if (accessToken) {
-      localStorage.setItem("accessToken", accessToken);
-    }
-
-    if (refreshToken) {
-      localStorage.setItem("refreshToken", refreshToken);
-    }
-
-    if (data.user) {
-      localStorage.setItem("user", JSON.stringify(data.user));
-    }
+    const accessToken = data.tokens?.accessToken ?? data.accessToken;
+    const refreshToken = data.tokens?.refreshToken ?? data.refreshToken;
+    if (accessToken) localStorage.setItem("accessToken", accessToken);
+    if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+    if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
   };
 
   const handleAuth = async (event: FormEvent<HTMLFormElement>) => {
@@ -174,9 +110,8 @@ export default function LoginPage() {
     if (isSignup && accountTypes.length === 0) {
       toast({
         variant: "destructive",
-        title: "Choose how you will use HireCore",
-        description:
-          "Select Worker, Employer, or both before creating your account.",
+        title: "Profile setup incomplete",
+        description: "Please select at least one intent (Worker or Employer) to continue.",
       });
       return;
     }
@@ -184,28 +119,14 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const endpoint = isSignup
-        ? "/auth/register"
-        : "/auth/login";
-
+      const endpoint = isSignup ? "/auth/register" : "/auth/login";
       const payload = isSignup
-        ? {
-            fullName,
-            email,
-            password,
-            phoneNumber: phoneNumber || undefined,
-            accountTypes,
-          }
-        : {
-            email,
-            password,
-          };
+        ? { fullName, email, password, phoneNumber: phoneNumber || undefined, accountTypes }
+        : { email, password };
 
       const response = await fetch(`${API_URL}${endpoint}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(payload),
       });
@@ -214,458 +135,297 @@ export default function LoginPage() {
 
       if (!response.ok) {
         throw new Error(
-          Array.isArray(data.message)
-            ? data.message.join(", ")
-            : data.message || "Authentication failed",
+          Array.isArray(data.message) ? data.message.join(", ") : data.message || "Authentication failed"
         );
       }
 
       persistAuth(data);
-
       toast({
-        title: isSignup ? "Account created" : "Welcome back",
-        description: isSignup
-          ? "Your HireCore account is ready."
-          : "You have signed in successfully.",
+        title: isSignup ? "Welcome to HireCore" : "Welcome back",
+        description: isSignup ? "Your workspace is ready." : "Successfully authenticated.",
       });
 
       window.location.href = redirect;
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: isSignup ? "Signup failed" : "Sign-in failed",
-        description:
-          error?.message || "Something went wrong. Please try again.",
+        title: "Authentication Error",
+        description: error?.message || "An unexpected error occurred.",
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = `${API_URL}/auth/google`;
-  };
-
   return (
-    <main className="relative min-h-screen overflow-hidden bg-background text-foreground">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,hsl(var(--primary)/0.22),transparent_30%),radial-gradient(circle_at_82%_18%,hsl(var(--secondary)/0.18),transparent_28%),radial-gradient(circle_at_70%_88%,hsl(var(--primary)/0.12),transparent_34%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.15)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.15)_1px,transparent_1px)] bg-[size:72px_72px] opacity-40" />
-      </div>
-
+    <main className="relative min-h-screen bg-neutral-950 text-neutral-50 selection:bg-primary selection:text-primary-foreground antialiased lg:grid lg:grid-cols-12">
+      
+      {/* Back Navigation Global */}
       <Link
         href="/"
-        className="absolute left-5 top-5 z-20 inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/75 px-4 py-2 text-sm font-medium text-muted-foreground shadow-sm backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-primary/40 hover:text-foreground sm:left-8 sm:top-8"
+        className="absolute left-6 top-6 z-50 inline-flex h-9 items-center gap-2 rounded-full border border-neutral-800 bg-neutral-900/50 px-4 text-xs font-medium text-neutral-400 backdrop-blur-md transition hover:border-neutral-700 hover:text-neutral-200"
       >
-        <ArrowLeft className="h-4 w-4" />
-        Back home
+        <ArrowLeft className="h-3.5 w-3.5" />
+        Return Home
       </Link>
 
-      <section className="relative z-10 mx-auto grid min-h-screen w-full max-w-[1500px] items-center gap-10 px-5 py-24 lg:grid-cols-[1.05fr_0.95fr] lg:px-10 xl:px-16">
-        <div className="hidden lg:block">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.65, ease: "easeOut" }}
-            className="max-w-2xl"
-          >
-            <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
-              <Sparkles className="h-4 w-4" />
-              HireCore Local — built for movement
-            </div>
-
-            <Image
-              src="/hirecore-local.svg"
-              alt="HireCore Local"
-              width={170}
-              height={170}
-              className="mb-5"
-            />
-
-            <h1 className="max-w-4xl text-5xl font-black leading-[1.03] tracking-tight text-foreground xl:text-6xl">
-              Create an account that knows whether you{" "}
-              <span className="bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
-                work, hire, or do both.
-              </span>
-            </h1>
-
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-              HireCore Local is not just a login screen with a job board behind
-              it. It is a pathway: workers become visible, employers find real
-              talent, and verified workforce members move with a stronger trust
-              signal.
-            </p>
-
-            <div className="mt-9 grid gap-4">
-              {platformBenefits.map((benefit, index) => {
-                const Icon = benefit.icon;
-
-                return (
-                  <motion.div
-                    key={benefit.title}
-                    initial={{ opacity: 0, y: 18 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.5,
-                      delay: 0.14 + index * 0.08,
-                    }}
-                    className="group flex gap-4 rounded-[1.75rem] border border-border/70 bg-card/65 p-5 shadow-sm backdrop-blur-xl transition hover:-translate-y-1 hover:border-primary/30 hover:bg-card/85"
-                  >
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-primary/15 bg-primary/10 text-primary">
-                      <Icon className="h-5 w-5" />
-                    </div>
-
-                    <div>
-                      <h3 className="text-base font-bold text-foreground">
-                        {benefit.title}
-                      </h3>
-                      <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                        {benefit.description}
-                      </p>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            <div className="mt-7 rounded-[2rem] border border-primary/20 bg-primary/[0.08] p-6 shadow-sm backdrop-blur-xl">
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
-                  <BadgeCheck className="h-5 w-5" />
-                </div>
-
-                <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
-                    Why HireCore Workforce matters
-                  </p>
-                  <h3 className="mt-1 text-xl font-black text-foreground">
-                    Verified workers carry more signal.
-                  </h3>
-                </div>
-              </div>
-
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                {workforceBenefits.map((item) => (
-                  <div
-                    key={item}
-                    className="flex items-start gap-3 rounded-2xl border border-border/60 bg-background/55 p-4"
-                  >
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                    <p className="text-sm leading-6 text-muted-foreground">
-                      {item}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
+      {/* Left Column: Context Branding (Hidden on mobile) */}
+      <section className="relative hidden flex-col justify-between overflow-hidden bg-neutral-900 p-12 lg:col-span-5 lg:flex xl:col-span-4">
+        {/* Abstract Ambient Mesh */}
+        <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+          <div className="absolute -left-20 -top-20 h-80 w-80 rounded-full bg-primary/20 blur-[100px]" />
+          <div className="absolute right-10 bottom-10 h-96 w-96 rounded-full bg-indigo-500/10 blur-[130px]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#232323_1px,transparent_1px),linear-gradient(to_bottom,#232323_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black_1px)]" />
         </div>
 
-        <div className="flex w-full justify-center">
-          <motion.div
-            initial={{ opacity: 0, y: 32, scale: 0.985 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="w-full max-w-2xl rounded-[2rem] border border-border/80 bg-card/82 p-5 shadow-2xl shadow-black/10 backdrop-blur-2xl sm:p-7 lg:max-w-xl xl:max-w-2xl"
+        <div className="relative z-10">
+          <Image
+            src="/hirecore-local.svg"
+            alt="HireCore Local"
+            width={130}
+            height={32}
+            className="h-8 w-auto priority"
+          />
+        </div>
+
+        <div className="relative z-10 my-auto max-w-sm space-y-6">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-neutral-800 bg-neutral-950/60 px-3 py-1 text-xs font-medium text-neutral-300">
+            <Sparkles className="h-3.5 w-3.5 text-primary" />
+            Designed for workforce velocity
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight leading-tight text-neutral-100">
+            The multi-lane marketplace for local placement.
+          </h1>
+          <p className="text-sm leading-relaxed text-neutral-400">
+            Toggle, manage, and transition between sourcing talent and taking up assignments seamlessly under one verified core account profile.
+          </p>
+        </div>
+
+        <div className="relative z-10 border-t border-neutral-800/60 pt-6">
+          <p className="text-xs text-neutral-500">
+            Protected infrastructure ecosystem. © {new Date().getFullYear()} HireCore.
+          </p>
+        </div>
+      </section>
+
+      {/* Right Column: Dynamic Form Container */}
+      <section className="flex flex-col justify-center px-4 py-24 sm:px-12 lg:col-span-7 lg:px-16 xl:col-span-8 max-w-2xl mx-auto w-full">
+        <div className="w-full space-y-8">
+          
+          {/* Form Header Segment */}
+          <div className="space-y-2">
+            <h2 className="text-2xl font-semibold tracking-tight text-neutral-100">
+              {isSignup ? "Create your workspace account" : "Sign in to HireCore"}
+            </h2>
+            <p className="text-sm text-neutral-400">
+              {isSignup 
+                ? "Configure your interface profile layer to initiate deployment." 
+                : "Resume where your pipeline and project operations paused."
+              }
+            </p>
+          </div>
+
+          {/* Core Auth Segment Trigger Toggle */}
+          <div className="grid grid-cols-2 rounded-lg bg-neutral-900 p-1 text-xs font-medium">
+            <button
+              type="button"
+              onClick={() => setIsSignup(false)}
+              className={`rounded-[6px] py-2 transition-all ${
+                !isSignup ? "bg-neutral-800 text-neutral-100 shadow" : "text-neutral-400 hover:text-neutral-200"
+              }`}
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsSignup(true)}
+              className={`rounded-[6px] py-2 transition-all ${
+                isSignup ? "bg-neutral-800 text-neutral-100 shadow" : "text-neutral-400 hover:text-neutral-200"
+              }`}
+            >
+              Register
+            </button>
+          </div>
+
+          {/* Social Provider Oauth Row */}
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full h-11 rounded-lg border-neutral-800 bg-neutral-900 hover:bg-neutral-800/80 text-neutral-200 text-xs font-medium"
+            onClick={() => window.location.href = `${API_URL}/auth/google`}
+            disabled={loading}
           >
-            <div className="mb-7 flex flex-col items-center text-center lg:hidden">
-              <Image
-                src="/hirecore-local.svg"
-                alt="HireCore Local"
-                width={120}
-                height={120}
-              />
-              <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-                <Sparkles className="h-3.5 w-3.5" />
-                HireCore Local
-              </div>
-            </div>
+            <svg className="mr-2.5 h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Continue with Google
+          </Button>
 
-            <div className="mb-7 flex rounded-full border border-border/80 bg-background/70 p-1.5">
-              <button
-                type="button"
-                onClick={() => setIsSignup(false)}
-                className={`flex-1 rounded-full px-4 py-3 text-sm font-bold transition ${
-                  !isSignup
-                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Sign in
-              </button>
+          {/* Visual Divider separator */}
+          <div className="relative flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-neutral-800/80" /></div>
+            <span className="relative bg-neutral-950 px-3 text-[10px] font-bold uppercase tracking-widest text-neutral-500">or credential access</span>
+          </div>
 
-              <button
-                type="button"
-                onClick={() => setIsSignup(true)}
-                className={`flex-1 rounded-full px-4 py-3 text-sm font-bold transition ${
-                  isSignup
-                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Create account
-              </button>
-            </div>
+          {/* Structural Action Form */}
+          <form onSubmit={handleAuth} className="space-y-4">
+            
+            <AnimatePresence initial={false} mode="popLayout">
+              {isSignup && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.15 }}
+                  className="space-y-4"
+                >
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-neutral-400">Full Name</Label>
+                      <div className="relative">
+                        <UserRound className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-500" />
+                        <Input
+                          type="text"
+                          placeholder="John Doe"
+                          className="h-10 rounded-lg border-neutral-800 bg-neutral-900/50 pl-9 text-xs text-neutral-200 focus-visible:ring-1 focus-visible:ring-neutral-700"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </div>
 
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={isSignup ? "signup-heading" : "login-heading"}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.22 }}
-                className="mb-6"
-              >
-                <h2 className="text-3xl font-black tracking-tight text-foreground">
-                  {authTitle}
-                </h2>
-                <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-                  {authDescription}
-                </p>
-              </motion.div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-neutral-400">Phone Number (Optional)</Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-500" />
+                        <Input
+                          type="tel"
+                          placeholder="+233..."
+                          className="h-10 rounded-lg border-neutral-800 bg-neutral-900/50 pl-9 text-xs text-neutral-200 focus-visible:ring-1 focus-visible:ring-neutral-700"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Intent Selection Area inside Signup scope */}
+                  <div className="space-y-2 pt-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs text-neutral-400">Account Configuration</Label>
+                      <span className="text-[11px] font-medium text-primary bg-primary/5 border border-primary/10 rounded px-2 py-0.5">
+                        {selectedAccountTypeLabel}
+                      </span>
+                    </div>
+
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {accountTypeCards.map((card) => {
+                        const Icon = card.icon;
+                        const isSelected = accountTypes.includes(card.value);
+
+                        return (
+                          <button
+                            key={card.value}
+                            type="button"
+                            onClick={() => toggleAccountType(card.value)}
+                            className={`flex flex-col items-start rounded-xl border p-4 text-left transition-all relative ${
+                              isSelected
+                                ? "border-primary/50 bg-primary/[0.02]"
+                                : "border-neutral-800 bg-neutral-900/30 hover:bg-neutral-900/60"
+                            }`}
+                          >
+                            <div className="flex w-full items-center justify-between">
+                              <div className={`p-1.5 rounded-md ${isSelected ? 'bg-primary/10 text-primary' : 'bg-neutral-800 text-neutral-400'}`}>
+                                <Icon className="h-4 w-4" />
+                              </div>
+                              <div className={`h-4 w-4 rounded-md border flex items-center justify-center transition-colors ${isSelected ? 'border-primary bg-primary text-neutral-950' : 'border-neutral-700'}`}>
+                                {isSelected && <Check className="h-3 w-3 stroke-[3]" />}
+                              </div>
+                            </div>
+                            <h3 className="mt-3 text-xs font-semibold text-neutral-200">{card.title}</h3>
+                            <p className="mt-1 text-[11px] text-neutral-500 leading-normal">{card.description}</p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </AnimatePresence>
 
+            <div className="space-y-1.5">
+              <Label className="text-xs text-neutral-400">Email Address</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-500" />
+                <Input
+                  type="email"
+                  placeholder="name@domain.com"
+                  className="h-10 rounded-lg border-neutral-800 bg-neutral-900/50 pl-9 text-xs text-neutral-200 focus-visible:ring-1 focus-visible:ring-neutral-700"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs text-neutral-400">Password</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-500" />
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  className="h-10 rounded-lg border-neutral-800 bg-neutral-900/50 pl-9 pr-10 text-xs text-neutral-200 focus-visible:ring-1 focus-visible:ring-neutral-700"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={8}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition"
+                >
+                  {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                </button>
+              </div>
+            </div>
+
             <Button
-              type="button"
-              variant="outline"
-              className="h-13 w-full rounded-full border-border bg-background/75 text-foreground shadow-sm transition hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground"
-              onClick={handleGoogleLogin}
+              type="submit"
+              className="w-full h-10 mt-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-950 font-medium text-xs shadow transition-all active:scale-[0.99]"
               disabled={loading}
             >
-              <span className="mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-card text-sm font-black">
-                G
-              </span>
-              Continue with Google
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Synchronizing Platform...
+                </span>
+              ) : (
+                <span className="flex items-center justify-center gap-1.5">
+                  {isSignup ? "Initialize Core Account" : "Access Console"}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </span>
+              )}
             </Button>
+          </form>
 
-            <div className="my-6 flex items-center gap-3">
-              <div className="h-px flex-1 bg-border" />
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                or
-              </span>
-              <div className="h-px flex-1 bg-border" />
-            </div>
+          {/* Footer Inline Callout Toggle */}
+          <p className="text-center text-xs text-neutral-500">
+            {isSignup ? "Possess an operational account?" : "New operator on HireCore?"}{" "}
+            <button
+              type="button"
+              onClick={() => setIsSignup(!isSignup)}
+              className="font-medium text-neutral-300 underline underline-offset-4 hover:text-neutral-100 transition"
+            >
+              {isSignup ? "Sign in instead" : "Create identity layer"}
+            </button>
+          </p>
 
-            <form onSubmit={handleAuth} className="space-y-5">
-              <AnimatePresence initial={false}>
-                {isSignup && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.28 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="space-y-5 pb-5">
-                      <div className="grid gap-5 sm:grid-cols-2">
-                        <div>
-                          <Label className="text-sm font-semibold text-foreground">
-                            Full name
-                          </Label>
-                          <div className="relative mt-2">
-                            <UserRound className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                            <Input
-                              type="text"
-                              placeholder="Your full name"
-                              className="h-13 rounded-full border-border bg-background/80 pl-11 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
-                              value={fullName}
-                              onChange={(event) =>
-                                setFullName(event.target.value)
-                              }
-                              required
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <Label className="text-sm font-semibold text-foreground">
-                            Phone number
-                          </Label>
-                          <div className="relative mt-2">
-                            <Phone className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                            <Input
-                              type="tel"
-                              placeholder="+233..."
-                              className="h-13 rounded-full border-border bg-background/80 pl-11 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
-                              value={phoneNumber}
-                              onChange={(event) =>
-                                setPhoneNumber(event.target.value)
-                              }
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-                          <div>
-                            <Label className="text-sm font-semibold text-foreground">
-                              How will you use HireCore?
-                            </Label>
-                            <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                              Choose one or both. You can be a worker and an employer.
-                            </p>
-                          </div>
-
-                          <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-                            {selectedAccountTypeLabel}
-                          </span>
-                        </div>
-
-                        <div className="grid gap-3 sm:grid-cols-2">
-                          {accountTypeCards.map((card) => {
-                            const Icon = card.icon;
-                            const selected = accountTypes.includes(card.value);
-
-                            return (
-                              <button
-                                key={card.value}
-                                type="button"
-                                onClick={() => toggleAccountType(card.value)}
-                                className={`group relative overflow-hidden rounded-[1.5rem] border p-4 text-left transition ${
-                                  selected
-                                    ? "border-primary bg-primary/[0.12] shadow-lg shadow-primary/10"
-                                    : "border-border bg-background/70 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-card"
-                                }`}
-                              >
-                                <div className="flex items-start justify-between gap-3">
-                                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/15 bg-primary/10 text-primary">
-                                    <Icon className="h-5 w-5" />
-                                  </div>
-
-                                  <div
-                                    className={`flex h-6 w-6 items-center justify-center rounded-full border transition ${
-                                      selected
-                                        ? "border-primary bg-primary text-primary-foreground"
-                                        : "border-border text-transparent"
-                                    }`}
-                                  >
-                                    <CheckCircle2 className="h-4 w-4" />
-                                  </div>
-                                </div>
-
-                                <div className="mt-4">
-                                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
-                                    {card.highlight}
-                                  </p>
-                                  <h3 className="mt-1 text-base font-black text-foreground">
-                                    {card.title}
-                                  </h3>
-                                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                                    {card.description}
-                                  </p>
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {accountTypes.includes("WORKER") && (
-                        <div className="rounded-[1.5rem] border border-primary/20 bg-primary/[0.08] p-4">
-                          <div className="flex gap-3">
-                            <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                              <HandCoins className="h-4 w-4" />
-                            </div>
-
-                            <div>
-                              <p className="text-sm font-bold text-foreground">
-                                Workers can later apply to join HireCore Workforce
-                              </p>
-                              <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                                This verification path helps workers build trust,
-                                submit supporting documents when requested, and
-                                qualify for stronger HireCore-assigned opportunities.
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              <div>
-                <Label className="text-sm font-semibold text-foreground">
-                  Email
-                </Label>
-                <div className="relative mt-2">
-                  <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    type="email"
-                    placeholder="you@example.com"
-                    className="h-13 rounded-full border-border bg-background/80 pl-11 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label className="text-sm font-semibold text-foreground">
-                  Password
-                </Label>
-                <div className="relative mt-2">
-                  <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Minimum 8 characters"
-                    className="h-13 rounded-full border-border bg-background/80 pl-11 pr-12 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    required
-                    minLength={8}
-                  />
-
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((current) => !current)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground"
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                className="group h-13 w-full rounded-full bg-primary text-sm font-black text-primary-foreground shadow-xl shadow-primary/20 transition hover:-translate-y-0.5 hover:bg-primary/90"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Please wait...
-                  </>
-                ) : (
-                  <>
-                    {isSignup ? "Create HireCore Account" : "Sign In"}
-                    <ArrowRight className="ml-2 h-4 w-4 transition group-hover:translate-x-0.5" />
-                  </>
-                )}
-              </Button>
-            </form>
-
-            <div className="mt-6 rounded-[1.4rem] border border-border/70 bg-background/60 p-4 text-center text-sm text-muted-foreground">
-              {isSignup ? "Already have an account?" : "New to HireCore?"}{" "}
-              <button
-                type="button"
-                onClick={() => setIsSignup((current) => !current)}
-                className="font-black text-primary transition hover:underline"
-              >
-                {isSignup ? "Sign in" : "Create an account"}
-              </button>
-            </div>
-          </motion.div>
         </div>
       </section>
     </main>

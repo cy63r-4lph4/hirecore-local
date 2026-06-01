@@ -6,22 +6,34 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
+  BriefcaseBusiness,
+  Bug,
   ChevronDown,
+  FileText,
+  HelpCircle,
   LayoutDashboard,
   LogOut,
   Menu,
   Moon,
   Settings,
+  ShieldCheck,
   Sun,
   User,
+  UsersRound,
   X,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn, getInitials } from "@/lib/utils";
-import { useTheme } from "@/components/shared/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { useAuth } from "@/providers/AuthProvider";
+
+type NavLink = {
+  href: string;
+  label: string;
+  icon?: React.ComponentType<{ className?: string }>;
+};
 
 function useOutsideClick<T extends HTMLElement>(
   ref: React.RefObject<T | null>,
@@ -44,6 +56,52 @@ function useOutsideClick<T extends HTMLElement>(
     };
   }, [enabled, handler, ref]);
 }
+
+const publicLinks: NavLink[] = [
+  {
+    href: "/tasks",
+    label: "Browse Tasks",
+    icon: BriefcaseBusiness,
+  },
+  {
+    href: "/workers",
+    label: "Find Workers",
+    icon: UsersRound,
+  },
+  {
+    href: "/how-it-works",
+    label: "How It Works",
+    icon: HelpCircle,
+  },
+  {
+    href: "/policies",
+    label: "Policies",
+    icon: ShieldCheck,
+  },
+  {
+    href: "/bug-report",
+    label: "Report Bug",
+    icon: Bug,
+  },
+];
+
+const authedLinks: NavLink[] = [
+  {
+    href: "/dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    href: "/profile",
+    label: "Profile",
+    icon: User,
+  },
+  {
+    href: "/settings",
+    label: "Settings",
+    icon: Settings,
+  },
+];
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -88,18 +146,8 @@ export default function Navbar() {
     return () => document.removeEventListener("keydown", handleEscape);
   }, []);
 
-  const navLinks = [
-    { href: "/tasks", label: "Browse Tasks" },
-    { href: "/apply-workforce", label: "Join Workforce" },
-  ];
-
-  const authedLinks = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/profile", label: "Profile", icon: User },
-    { href: "/settings", label: "Settings", icon: Settings },
-  ];
-
-  const isActive = (href: string) => pathname === href;
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(`${href}/`);
 
   const userName = user?.fullName || user?.email || "User";
   const userEmail = user?.email || "";
@@ -117,15 +165,13 @@ export default function Navbar() {
 
       <div className="relative flex h-17.5 items-center justify-between px-4 sm:px-6">
         <Link href="/" className="group flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary shadow-[0_6px_20px_hsl(var(--primary)/0.35)] transition group-hover:scale-105">
-            <Image
-              src="/HireCore.png"
-              alt="HireCore Logo"
-              width={36}
-              height={36}
-              priority
-            />
-          </div>
+          <Image
+            src="/hirecore-local.svg"
+            alt="HireCore Logo"
+            width={38}
+            height={38}
+            priority
+          />
 
           <span className="text-lg font-semibold tracking-tight text-nav-foreground/90 transition group-hover:text-nav-foreground">
             Hire<span className="text-primary">Core</span>
@@ -133,7 +179,7 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden items-center gap-6 md:flex">
-          {navLinks.map((link) => (
+          {publicLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -149,21 +195,6 @@ export default function Navbar() {
               )}
             </Link>
           ))}
-
-          {authenticated && (
-            <Link
-              href="/dashboard"
-              className="relative text-sm font-medium text-nav-foreground/70 transition hover:text-nav-foreground"
-            >
-              Dashboard
-              {isActive("/dashboard") && (
-                <motion.span
-                  layoutId="nav-indicator"
-                  className="absolute -bottom-1 left-0 h-0.5 w-full bg-primary"
-                />
-              )}
-            </Link>
-          )}
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
@@ -193,101 +224,106 @@ export default function Navbar() {
           </button>
 
           {!loading && !authenticated && (
-            <div className="hidden items-center gap-2 sm:flex">
-              <Link href="/auth/login">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="rounded-full px-4 text-nav-foreground hover:bg-accent hover:text-accent-foreground"
-                >
-                  Sign in
-                </Button>
-              </Link>
+            <Link href="/auth" className="hidden sm:block">
+              <Button
+                size="sm"
+                className="rounded-full bg-primary px-5 text-primary-foreground shadow-[0_6px_20px_hsl(var(--primary)/0.35)] transition hover:scale-[1.03] hover:bg-primary/90"
+              >
+                Sign in
+              </Button>
+            </Link>
+          )}
 
-              <Link href="/auth/login?mode=signup">
+          {!loading && authenticated && (
+            <>
+              <Link href="/dashboard" className="hidden sm:block">
                 <Button
                   size="sm"
                   className="rounded-full bg-primary px-5 text-primary-foreground shadow-[0_6px_20px_hsl(var(--primary)/0.35)] transition hover:scale-[1.03] hover:bg-primary/90"
                 >
-                  Get Started
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  Dashboard
                 </Button>
               </Link>
-            </div>
-          )}
 
-          {!loading && authenticated && (
-            <div ref={userMenuRef} className="relative hidden sm:block">
-              <button
-                type="button"
-                onClick={() => setUserMenuOpen((open) => !open)}
-                aria-expanded={userMenuOpen}
-                aria-haspopup="menu"
-                className="flex items-center gap-2 rounded-full border border-border bg-surface-soft py-1 pl-1 pr-3 text-sm text-foreground transition hover:bg-accent hover:text-accent-foreground"
-              >
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-primary text-xs font-bold text-primary-foreground">
-                    {getInitials(userName)}
-                  </AvatarFallback>
-                </Avatar>
-
-                <span className="hidden max-w-28 truncate font-medium lg:block">
-                  {userName}
-                </span>
-
-                <ChevronDown
-                  className={cn(
-                    "h-4 w-4 text-muted-foreground transition-transform",
-                    userMenuOpen && "rotate-180",
-                  )}
-                />
-              </button>
-
-              {userMenuOpen && (
-                <div
-                  role="menu"
-                  className="absolute right-0 mt-3 w-64 overflow-hidden rounded-2xl border border-border bg-card/95 p-2 text-card-foreground shadow-[0_18px_50px_rgba(0,0,0,0.18)] backdrop-blur-2xl animate-in fade-in zoom-in-95"
+              <div ref={userMenuRef} className="relative hidden sm:block">
+                <button
+                  type="button"
+                  onClick={() => setUserMenuOpen((open) => !open)}
+                  aria-expanded={userMenuOpen}
+                  aria-haspopup="menu"
+                  className="flex items-center gap-2 rounded-full border border-border bg-surface-soft py-1 pl-1 pr-3 text-sm text-foreground transition hover:bg-accent hover:text-accent-foreground"
                 >
-                  <div className="p-3">
-                    <p className="truncate text-sm font-semibold">
-                      {userName}
-                    </p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      {userEmail}
-                    </p>
-                  </div>
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-primary text-xs font-bold text-primary-foreground">
+                      {getInitials(userName)}
+                    </AvatarFallback>
+                  </Avatar>
 
-                  <div className="my-1 h-px bg-border" />
+                  <span className="hidden max-w-28 truncate font-medium lg:block">
+                    {userName}
+                  </span>
 
-                  {authedLinks.map((link) => {
-                    const Icon = link.icon;
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 text-muted-foreground transition-transform",
+                      userMenuOpen && "rotate-180",
+                    )}
+                  />
+                </button>
 
-                    return (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        role="menuitem"
-                        className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-muted-foreground transition hover:bg-accent hover:text-accent-foreground"
-                      >
-                        <Icon className="h-4 w-4" />
-                        {link.label}
-                      </Link>
-                    );
-                  })}
-
-                  <div className="my-1 h-px bg-border" />
-
-                  <button
-                    type="button"
-                    onClick={logout}
-                    role="menuitem"
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-destructive transition hover:bg-destructive/10"
+                {userMenuOpen && (
+                  <div
+                    role="menu"
+                    className="absolute right-0 mt-3 w-64 overflow-hidden rounded-2xl border border-border bg-card/95 p-2 text-card-foreground shadow-[0_18px_50px_rgba(0,0,0,0.18)] backdrop-blur-2xl animate-in fade-in zoom-in-95"
                   >
-                    <LogOut className="h-4 w-4" />
-                    Sign out
-                  </button>
-                </div>
-              )}
-            </div>
+                    <div className="p-3">
+                      <p className="truncate text-sm font-semibold">
+                        {userName}
+                      </p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {userEmail}
+                      </p>
+                    </div>
+
+                    <div className="my-1 h-px bg-border" />
+
+                    {authedLinks.map((link) => {
+                      const Icon = link.icon;
+
+                      return (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          role="menuitem"
+                          className={cn(
+                            "flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition hover:bg-accent hover:text-accent-foreground",
+                            isActive(link.href)
+                              ? "bg-accent text-accent-foreground"
+                              : "text-muted-foreground",
+                          )}
+                        >
+                          {Icon && <Icon className="h-4 w-4" />}
+                          {link.label}
+                        </Link>
+                      );
+                    })}
+
+                    <div className="my-1 h-px bg-border" />
+
+                    <button
+                      type="button"
+                      onClick={logout}
+                      role="menuitem"
+                      className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-destructive transition hover:bg-destructive/10"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
           )}
 
           <div ref={mobileMenuRef} className="md:hidden">
@@ -298,11 +334,7 @@ export default function Navbar() {
               onClick={() => setMenuOpen((open) => !open)}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface-soft text-foreground transition hover:bg-accent hover:text-accent-foreground"
             >
-              {menuOpen ? (
-                <X className="h-5 w-5" />
-              ) : (
-                <Menu className="h-5 w-5" />
-              )}
+              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
 
             {menuOpen && (
@@ -327,71 +359,76 @@ export default function Navbar() {
                 )}
 
                 <div className="flex flex-col gap-1">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={cn(
-                        "rounded-xl px-3 py-3 text-sm font-medium transition hover:bg-accent hover:text-accent-foreground",
-                        isActive(link.href)
-                          ? "bg-accent text-accent-foreground"
-                          : "text-muted-foreground",
-                      )}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
+                  <p className="px-3 pb-1 pt-2 text-[11px] font-black uppercase tracking-[0.18em] text-muted-foreground">
+                    Explore
+                  </p>
 
-                  {authenticated &&
-                    authedLinks.map((link) => {
-                      const Icon = link.icon;
+                  {publicLinks.map((link) => {
+                    const Icon = link.icon;
 
-                      return (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          className={cn(
-                            "flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition hover:bg-accent hover:text-accent-foreground",
-                            isActive(link.href)
-                              ? "bg-accent text-accent-foreground"
-                              : "text-muted-foreground",
-                          )}
-                        >
-                          <Icon className="h-4 w-4" />
-                          {link.label}
-                        </Link>
-                      );
-                    })}
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className={cn(
+                          "flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition hover:bg-accent hover:text-accent-foreground",
+                          isActive(link.href)
+                            ? "bg-accent text-accent-foreground"
+                            : "text-muted-foreground",
+                        )}
+                      >
+                        {Icon && <Icon className="h-4 w-4" />}
+                        {link.label}
+                      </Link>
+                    );
+                  })}
 
                   <div className="my-2 h-px bg-border" />
 
                   {!loading && !authenticated && (
-                    <>
-                      <Link
-                        href="/auth/login"
-                        className="rounded-xl px-3 py-3 text-sm font-medium text-muted-foreground transition hover:bg-accent hover:text-accent-foreground"
-                      >
-                        Sign in
-                      </Link>
-
-                      <Link
-                        href="/auth/login?mode=signup"
-                        className="rounded-xl bg-primary px-3 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
-                      >
-                        Get Started
-                      </Link>
-                    </>
+                    <Link
+                      href="/auth"
+                      className="rounded-xl bg-primary px-3 py-3 text-center text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+                    >
+                      Sign in
+                    </Link>
                   )}
 
                   {!loading && authenticated && (
-                    <button
-                      type="button"
-                      onClick={logout}
-                      className="flex items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium text-destructive transition hover:bg-destructive/10"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      Sign out
-                    </button>
+                    <>
+                      <p className="px-3 pb-1 pt-2 text-[11px] font-black uppercase tracking-[0.18em] text-muted-foreground">
+                        Account
+                      </p>
+
+                      {authedLinks.map((link) => {
+                        const Icon = link.icon;
+
+                        return (
+                          <Link
+                            key={link.href}
+                            href={link.href}
+                            className={cn(
+                              "flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition hover:bg-accent hover:text-accent-foreground",
+                              isActive(link.href)
+                                ? "bg-accent text-accent-foreground"
+                                : "text-muted-foreground",
+                            )}
+                          >
+                            {Icon && <Icon className="h-4 w-4" />}
+                            {link.label}
+                          </Link>
+                        );
+                      })}
+
+                      <button
+                        type="button"
+                        onClick={logout}
+                        className="flex items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium text-destructive transition hover:bg-destructive/10"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Sign out
+                      </button>
+                    </>
                   )}
                 </div>
               </div>

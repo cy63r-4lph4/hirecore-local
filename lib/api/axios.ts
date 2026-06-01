@@ -1,37 +1,39 @@
 // src/lib/api/axios.ts
-import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
-import {
-  clearAuthStorage,
-  getAccessToken,
-  getRefreshToken,
-  setAccessToken,
-  setRefreshToken,
-} from "@/lib/storage";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
+
+import { clearAuthStorage } from "@/lib/storage";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
 
 export const api = axios.create({
   baseURL: API_URL,
-  withCredentials: false,
+  withCredentials: true,
+});
+
+const refreshClient = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
 });
 
 type RetryableRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean;
 };
 
-let isRefreshing = false;
-
-let failedQueue: {
-  resolve: (token: string) => void;
+type FailedQueueItem = {
+  resolve: () => void;
   reject: (error: unknown) => void;
-}[] = [];
+};
 
-function processQueue(error: unknown, token: string | null = null) {
+let isRefreshing = false;
+let failedQueue: FailedQueueItem[] = [];
+
+function processQueue(error: unknown = null) {
   failedQueue.forEach((promise) => {
     if (error) {
       promise.reject(error);
-    } else if (token) {
-      promise.resolve(token);
+    } else {
+      promise.resolve();
     }
   });
 
@@ -42,50 +44,85 @@ function forceLogout() {
   clearAuthStorage();
 
   if (typeof window !== "undefined") {
-    window.location.href = "/auth/login";
+    const currentPath = window.location.pathname;
+
+    /**
+     * Prevent redirect loops while already on public auth pages.
+     */
+    if (!currentPath.startsWith("/auth")) {
+      window.location.href = "/auth";
+    }
   }
 }
 
-api.interceptors.request.use((config) => {
-  const token = getAccessToken();
+function shouldSkipRefresh(url?: string) {
+  if (!url) return false;
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  return (
+    url.includes("/auth/login") ||
+    url.includes("/auth/register") ||
+    url.includes("/auth/refresh") ||
+    url.includes("/auth/password/forgot") ||
+    url.includes("/auth/password/reset")
+  );
+}
 
-  return config;
-});
+function isSilentAuthProbe(url?: string) {
+  if (!url) return false;
+
+  /**
+   * AuthProvider uses /auth/me simply to ask:
+   * "Is there a valid cookie session?"
+   *
+   * If there is not, that is normal on public pages.
+   * Do not force a hard redirect.
+   */
+  return url.includes("/auth/me");
+}
 
 api.interceptors.response.use(
   (response) => response,
 
   async (error: AxiosError<any>) => {
-    const originalRequest = error.config as RetryableRequestConfig;
+    const originalRequest = error.config as RetryableRequestConfig | undefined;
+
     const status = error.response?.status;
 
+    /**
+     * 403 means "authenticated but not allowed".
+     * Do not try to refresh.
+     *
+     * Examples:
+     * - EMAIL_VERIFICATION_REQUIRED
+     * - wrong account type
+     * - role restriction
+     */
     if (status === 403) {
-      console.warn("Forbidden: user does not have permission.");
       return Promise.reject(error);
     }
 
-    if (status !== 401 || originalRequest?._retry) {
-      return Promise.reject(error);
-    }
-
-    const refreshToken = getRefreshToken();
-
-    if (!refreshToken) {
-      forceLogout();
+    /**
+     * Only 401s are refresh candidates.
+     */
+    if (
+      status !== 401 ||
+      !originalRequest ||
+      originalRequest._retry ||
+      shouldSkipRefresh(originalRequest.url)
+    ) {
       return Promise.reject(error);
     }
 
     originalRequest._retry = true;
 
+    /**
+     * If a refresh is already running,
+     * wait for it and retry once the cookie is updated.
+     */
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
         failedQueue.push({
-          resolve: (token: string) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
+          resolve: () => {
             resolve(api(originalRequest));
           },
           reject,
@@ -96,31 +133,28 @@ api.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      const { data } = await axios.post(`${API_URL}/auth/refresh`, {
-        refreshToken,
-      });
+      /**
+       * refresh_token is sent automatically in the HttpOnly cookie.
+       * The backend sets new auth cookies in the response.
+       */
+      await refreshClient.post("/auth/refresh", {});
 
-      const newAccessToken = data.accessToken;
-      const newRefreshToken = data.refreshToken;
-
-      if (!newAccessToken) {
-        throw new Error("Refresh endpoint did not return access token");
-      }
-
-      setAccessToken(newAccessToken);
-
-      if (newRefreshToken) {
-        setRefreshToken(newRefreshToken);
-      }
-
-      processQueue(null, newAccessToken);
-
-      originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+      processQueue();
 
       return api(originalRequest);
     } catch (refreshError) {
-      processQueue(refreshError, null);
-      forceLogout();
+      processQueue(refreshError);
+
+      /**
+       * /auth/me may fail simply because a visitor is not logged in.
+       * On public pages, that is not a logout crisis.
+       */
+      if (isSilentAuthProbe(originalRequest.url)) {
+        clearAuthStorage();
+      } else {
+        forceLogout();
+      }
+
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

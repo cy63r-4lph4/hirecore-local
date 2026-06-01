@@ -6,6 +6,7 @@ const adminNavItems = [
     href: "/dashboard/admin",
     label: "Overview",
     iconName: "layout",
+    exact: true,
   },
   {
     href: "/dashboard/admin/tasks",

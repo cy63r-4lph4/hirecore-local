@@ -1,5 +1,6 @@
 import { api } from "@/lib/api/axios";
-import { getRefreshToken } from "@/lib/storage";
+
+export type AccountType = "WORKER" | "EMPLOYER";
 
 export interface LoginPayload {
   email: string;
@@ -11,6 +12,21 @@ export interface RegisterPayload {
   phoneNumber?: string;
   email: string;
   password: string;
+  accountTypes: AccountType[];
+}
+
+export interface VerifyEmailPayload {
+  code: string;
+}
+
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+export interface ResetPasswordPayload {
+  email: string;
+  code: string;
+  newPassword: string;
 }
 
 export async function loginUser(payload: LoginPayload) {
@@ -29,13 +45,31 @@ export async function getMe() {
 }
 
 export async function logoutUser() {
-  const refreshToken = getRefreshToken();
+  const { data } = await api.post("/auth/logout", {});
+  return data;
+}
 
-  if (!refreshToken) return;
+export async function logoutAllSessions() {
+  const { data } = await api.post("/auth/logout-all", {});
+  return data;
+}
 
-  const { data } = await api.post("/auth/logout", {
-    refreshToken,
-  });
+export async function sendEmailVerificationOtp() {
+  const { data } = await api.post("/auth/email/send-verification-otp", {});
+  return data;
+}
 
+export async function verifyEmail(payload: VerifyEmailPayload) {
+  const { data } = await api.post("/auth/email/verify", payload);
+  return data;
+}
+
+export async function forgotPassword(payload: ForgotPasswordPayload) {
+  const { data } = await api.post("/auth/password/forgot", payload);
+  return data;
+}
+
+export async function resetPassword(payload: ResetPasswordPayload) {
+  const { data } = await api.post("/auth/password/reset", payload);
   return data;
 }

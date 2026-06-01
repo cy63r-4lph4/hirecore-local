@@ -57,7 +57,7 @@ function MetricCard({
   description: string;
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-[2rem] border border-border bg-background/40 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:bg-background hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_20px_40px_-15px_rgba(var(--primary),0.1)]">
+    <div className="group relative overflow-hidden rounded-4xl border border-border bg-background/40 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:bg-background hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_20px_40px_-15px_rgba(var(--primary),0.1)]">
       <div className="absolute -right-8 -top-8 opacity-[0.04] transition group-hover:opacity-[0.08]">
         <Icon className="h-32 w-32" />
       </div>
@@ -450,7 +450,10 @@ export default function SuperAdminPage() {
           </div>
 
           <div className="grid gap-3">
-            <MiniAssetRow label="Profile Images" value={uploads.profileImages} />
+            <MiniAssetRow
+              label="Profile Images"
+              value={uploads.profileImages}
+            />
 
             <MiniAssetRow
               label="Job Attachments"
