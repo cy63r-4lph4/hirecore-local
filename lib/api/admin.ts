@@ -50,7 +50,6 @@ export async function updateAdminTask(
     description: string;
     pay: number;
     location: string;
-    category: string;
   },
 ) {
   const { data } = await api.patch(`/admin/jobs/${id}`, payload);

@@ -33,3 +33,25 @@ export function formatDate(value?: string | Date | null) {
     year: "numeric",
   }).format(date);
 }
+
+export function getApplicationStatusColor(status?: string | null) {
+  switch (status) {
+    case "PENDING":
+      return "bg-amber-500/10 text-amber-600 border-amber-500/20";
+
+    case "ACCEPTED":
+      return "bg-emerald-500/10 text-emerald-600 border-emerald-500/20";
+
+    case "REJECTED":
+      return "bg-red-500/10 text-red-600 border-red-500/20";
+
+    case "IN_PROGRESS":
+      return "bg-blue-500/10 text-blue-600 border-blue-500/20";
+
+    case "COMPLETED":
+      return "bg-primary/10 text-primary border-primary/20";
+
+    default:
+      return "bg-muted text-muted-foreground border-border";
+  }
+}

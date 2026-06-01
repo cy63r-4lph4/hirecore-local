@@ -61,7 +61,7 @@ export default function TaskDetailAdminClient({ taskId }: { taskId: string }) {
             Refresh
           </Button>
 
-          <Button variant="brand" asChild className="h-11 rounded-xl px-6 font-bold shadow-lg shadow-primary/20 transition-transform hover:scale-[1.02]">
+          <Button asChild className="h-11 rounded-xl px-6 font-bold shadow-lg shadow-primary/20 transition-transform hover:scale-[1.02] bg-primary text-primary-foreground hover:bg-primary/90">
             <Link href={`/dashboard/admin/tasks/${task.id}/edit`}>
               <Edit className="mr-2 h-4 w-4" />
               Modify Task
