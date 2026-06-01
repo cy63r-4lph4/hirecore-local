@@ -292,7 +292,7 @@ export default function PoliciesPage() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="text-balance text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl bg-gradient-to-b from-foreground to-foreground/80 bg-clip-text"
+              className="text-balance text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl bg-linear-to-b from-foreground to-foreground/80 bg-clip-text"
             >
               Simple rules for safer local work.
             </motion.h1>
@@ -444,7 +444,7 @@ export default function PoliciesPage() {
           className="mx-auto max-w-7xl overflow-hidden rounded-[2rem] border border-border bg-foreground p-8 text-background shadow-2xl relative"
         >
           {/* Subtle grid accent behind bottom block */}
-          <div className="absolute inset-0 opacity-5 bg-[linear-gradient(to_right,#000_1px,transparent_1px),linear-gradient(to_bottom,#000_1px,transparent_1px)] bg-[size:2rem_2rem]" />
+          <div className="absolute inset-0 opacity-5 bg-[linear-gradient(to_right,#000_1px,transparent_1px),linear-gradient(to_bottom,#000_1px,transparent_1px)] bg-size-[2rem_2rem]" />
           
           <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center relative z-10">
             <div>
@@ -465,7 +465,7 @@ export default function PoliciesPage() {
               </p>
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row lg:flex-col shrink-0 min-w-[200px]">
+            <div className="flex flex-col gap-3 sm:flex-row lg:flex-col shrink-0 min-w-50">
               <Link
                 href="/bug-report"
                 className="inline-flex h-12 items-center justify-center rounded-full bg-background px-6 text-sm font-black text-foreground transition-transform hover:scale-[1.03] active:scale-95"

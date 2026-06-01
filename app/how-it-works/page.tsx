@@ -144,14 +144,14 @@ export default function HowItWorksPage() {
   return (
     <main className="min-h-screen bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground">
       {/* Background Decorative Mesh grids */}
-      <div className="absolute inset-0 -z-20 bg-[linear-gradient(to_right,hsl(var(--border)/0.3)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.3)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+      <div className="absolute inset-0 -z-20 bg-[linear-gradient(to_right,hsl(var(--border)/0.3)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.3)_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
 
       <section className="relative px-4 pb-20 pt-36 sm:px-6 lg:px-8">
-        <div className="absolute left-1/2 top-20 -z-10 h-[450px] w-[600px] -translate-x-1/2 rounded-full bg-primary/10 blur-[140px]" />
+        <div className="absolute left-1/2 top-20 -z-10 h-112.5 w-150 -translate-x-1/2 rounded-full bg-primary/10 blur-[140px]" />
 
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-4xl text-center">
-            <h1 className="text-balance text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl lg:text-7xl bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
+            <h1 className="text-balance text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl lg:text-7xl bg-linear-to-b from-foreground to-foreground/70 bg-clip-text ">
               Localized Execution. <br />
               Zero Structural Chaos.
             </h1>
@@ -236,7 +236,7 @@ export default function HowItWorksPage() {
       </section>
 
       <section className="px-4 pb-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl rounded-[2.5rem] border border-border/80 bg-gradient-to-b from-card/50 to-card/20 p-8 shadow-2xl backdrop-blur-xl sm:p-12 lg:p-16 relative overflow-hidden">
+        <div className="mx-auto max-w-7xl rounded-[2.5rem] border border-border/80 bg-linear-to-b from-card/50 to-card/20 p-8 shadow-2xl backdrop-blur-xl sm:p-12 lg:p-16 relative overflow-hidden">
           <div className="absolute -left-40 -top-40 -z-10 h-96 w-96 rounded-full bg-primary/5 blur-[120px]" />
 
           <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
@@ -288,7 +288,7 @@ export default function HowItWorksPage() {
       <section className="px-4 pb-32 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl overflow-hidden rounded-[2.5rem] border border-border bg-foreground p-8 text-background shadow-2xl sm:p-12 lg:p-16 relative">
           {/* Subtle pattern background within the CTA */}
-          <div className="absolute inset-0 -z-10 opacity-5 bg-[linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] bg-[size:3rem_3rem]" />
+          <div className="absolute inset-0 -z-10 opacity-5 bg-[linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] bg-size-[3rem_3rem]" />
 
           <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center relative z-10">
             <div>
@@ -309,7 +309,7 @@ export default function HowItWorksPage() {
               </p>
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row lg:flex-col shrink-0 min-w-[200px]">
+            <div className="flex flex-col gap-3 sm:flex-row lg:flex-col shrink-0 min-w-50">
               <Link
                 href="/bug-report"
                 className="inline-flex h-12 items-center justify-center rounded-full bg-background px-6 text-sm font-bold text-foreground transition-transform hover:scale-[1.03] active:scale-95 shadow-lg"

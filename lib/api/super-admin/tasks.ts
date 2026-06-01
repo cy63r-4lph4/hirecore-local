@@ -1,17 +1,15 @@
 import { api } from "@/lib/api/axios";
+import {
+  ApplicationStatus,
+  getSuperAdminApplications,
+  GetSuperAdminApplicationsParams,
+} from "./applications";
 
 export type JobStatus = "OPEN" | "CLOSED" | "PENDING_APPROVAL" | "REJECTED";
 
 export type AssignmentType = "OPEN" | "HIRECORE_ASSIGNED";
 
 export type LocationVisibility = "HIDDEN" | "APPROXIMATE" | "PUBLIC";
-
-export type ApplicationStatus =
-  | "PENDING"
-  | "ACCEPTED"
-  | "REJECTED"
-  | "IN_PROGRESS"
-  | "COMPLETED";
 
 export type SuperAdminTask = {
   id: string;
@@ -134,27 +132,11 @@ export type SuperAdminTasksResponse = {
   };
 };
 
-export type SuperAdminApplicationsResponse = {
-  data: SuperAdminTaskApplication[];
-  meta: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-};
+
 
 export type GetSuperAdminTasksParams = {
   status?: JobStatus;
   assignmentType?: AssignmentType;
-  search?: string;
-  page?: number;
-  limit?: number;
-};
-
-export type GetSuperAdminApplicationsParams = {
-  status?: ApplicationStatus;
-  jobId?: string;
   search?: string;
   page?: number;
   limit?: number;
@@ -168,10 +150,7 @@ export type AssignWorkerPayload = {
   workerId: string;
 };
 
-export type UpdateApplicationStatusPayload = {
-  status: ApplicationStatus;
-  note?: string;
-};
+
 
 export async function getSuperAdminTasks(params?: GetSuperAdminTasksParams) {
   const { data } = await api.get<SuperAdminTasksResponse>(
@@ -221,19 +200,6 @@ export async function assignWorkerToSuperAdminTask(
   return data;
 }
 
-export async function getSuperAdminApplications(
-  params?: GetSuperAdminApplicationsParams,
-) {
-  const { data } = await api.get<SuperAdminApplicationsResponse>(
-    "/admin/super/applications",
-    {
-      params,
-    },
-  );
-
-  return data;
-}
-
 export async function getSuperAdminTaskApplications(taskId: string) {
   const response = await getSuperAdminApplications({
     jobId: taskId,
@@ -242,24 +208,4 @@ export async function getSuperAdminTaskApplications(taskId: string) {
   });
 
   return response;
-}
-
-export async function getSuperAdminApplication(id: string) {
-  const { data } = await api.get<SuperAdminTaskApplication>(
-    `/admin/super/applications/${id}`,
-  );
-
-  return data;
-}
-
-export async function updateSuperAdminApplicationStatus(
-  id: string,
-  payload: UpdateApplicationStatusPayload,
-) {
-  const { data } = await api.patch<SuperAdminTaskApplication>(
-    `/admin/super/applications/${id}/status`,
-    payload,
-  );
-
-  return data;
 }

@@ -38,11 +38,11 @@ export default function EmptyState({
       )}
       {action && (
         action.href ? (
-          <Button variant="brand" size="sm" asChild>
+          <Button variant="default" size="sm" asChild>
             <Link href={action.href}>{action.label}</Link>
           </Button>
         ) : (
-          <Button variant="brand" size="sm" onClick={action.onClick}>
+          <Button variant="default" size="sm" onClick={action.onClick}>
             {action.label}
           </Button>
         )

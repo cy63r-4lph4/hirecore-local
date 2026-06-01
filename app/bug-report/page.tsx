@@ -281,10 +281,10 @@ export default function BugReportPage() {
 
   return (
     <main className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/20">
-      <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,hsl(var(--border)/0.2)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.2)_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-40 [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+      <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,hsl(var(--border)/0.2)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.2)_1px,transparent_1px)] bg-size-[4rem_4rem] opacity-40 mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
 
       <section className="relative overflow-hidden px-4 pb-20 pt-36 sm:px-6 lg:px-8">
-        <div className="pointer-events-none absolute left-1/2 top-10 -z-20 h-96 w-[600px] -translate-x-1/2 animate-pulse rounded-full bg-primary/10 blur-[130px]" />
+        <div className="pointer-events-none absolute left-1/2 top-10 -z-20 h-96 w-150 -translate-x-1/2 animate-pulse rounded-full bg-primary/10 blur-[130px]" />
         <div className="pointer-events-none absolute right-10 top-44 -z-20 h-72 w-72 rounded-full bg-primary/5 blur-[100px]" />
 
         <div className="mx-auto max-w-7xl">
@@ -299,7 +299,7 @@ export default function BugReportPage() {
                 Bug Reporting
               </div>
 
-              <h1 className="bg-gradient-to-b from-foreground to-foreground/80 bg-clip-text text-balance text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
+              <h1 className="bg-linear-to-b from-foreground to-foreground/80 bg-clip-text text-balance text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
                 Found a crack in the system?
               </h1>
 
@@ -449,7 +449,7 @@ export default function BugReportPage() {
                                 updateField("priority", priority.value)
                               }
                               className={cn(
-                                "relative flex min-h-[105px] flex-col justify-between overflow-hidden rounded-2xl border p-4 text-left transition-all duration-300",
+                                "relative flex min-h-26.25 flex-col justify-between overflow-hidden rounded-2xl border p-4 text-left transition-all duration-300",
                                 isSelected
                                   ? cn(
                                       "bg-background shadow-md",
@@ -665,7 +665,7 @@ export default function BugReportPage() {
             transition={{ type: "spring", stiffness: 100, damping: 20 }}
             className="relative overflow-hidden rounded-[2.2rem] border border-border bg-foreground p-8 text-background shadow-2xl"
           >
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#000_1px,transparent_1px),linear-gradient(to_bottom,#000_1px,transparent_1px)] bg-[size:3rem_3rem] opacity-5" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#000_1px,transparent_1px),linear-gradient(to_bottom,#000_1px,transparent_1px)] bg-size-[3rem_3rem] opacity-5" />
 
             <div className="relative z-10 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
               <div>
@@ -685,7 +685,7 @@ export default function BugReportPage() {
                 </p>
               </div>
 
-              <div className="flex min-w-[200px] shrink-0 flex-col gap-3 sm:flex-row lg:flex-col">
+              <div className="flex min-w-50 shrink-0 flex-col gap-3 sm:flex-row lg:flex-col">
                 <Link
                   href="/policies"
                   className="inline-flex h-12 items-center justify-center rounded-full bg-background px-8 text-sm font-black text-foreground shadow-md transition-transform hover:scale-[1.03] active:scale-95"
@@ -767,7 +767,7 @@ function SuccessState({ onReset }: { onReset: () => void }) {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="flex min-h-[600px] flex-col items-center justify-center p-6 text-center"
+      className="flex min-h-150 flex-col items-center justify-center p-6 text-center"
     >
       <div className="relative">
         <div className="absolute inset-0 animate-pulse rounded-[2rem] bg-primary/20 blur-xl" />
