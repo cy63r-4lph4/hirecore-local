@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
-import { Inter, Geist } from "next/font/google";
+import { Geist, Inter } from "next/font/google";
 import "./globals.css";
 
 import { Toaster } from "@/components/ui/toaster";
-import Navbar from "@/components/shared/navbar";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import ConditionalNavbar from "@/components/shared/ConditionalNavbar";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,6 +24,39 @@ export const metadata: Metadata = {
   description:
     "A controlled workforce marketplace connecting skilled workers with local opportunities.",
   keywords: ["jobs", "local work", "workforce", "marketplace", "hire"],
+
+  icons: {
+    icon: [
+      {
+        url: "/Icons/favicon.ico",
+        sizes: "any",
+      },
+      {
+        url: "/Icons/favicon-16x16.png",
+        sizes: "16x16",
+        type: "image/png",
+      },
+      {
+        url: "/Icons/favicon-32x32.png",
+        sizes: "32x32",
+        type: "image/png",
+      },
+    ],
+    apple: [
+      {
+        url: "/Icons/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+    other: [
+      {
+        rel: "manifest",
+        url: "/Icons/site.webmanifest",
+      },
+    ],
+  },
+
   openGraph: {
     title: "HireCore Local",
     description: "Find verified local work opportunities.",
@@ -35,11 +70,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)} suppressHydrationWarning>
-      <body className="min-h-screen bg-background text-foreground font-sans antialiased selection:bg-primary/20 selection:text-primary-foreground">
+    <html
+      lang="en"
+      className={cn("font-sans", geist.variable, inter.variable)}
+      suppressHydrationWarning
+    >
+      <body className="min-h-screen bg-background font-sans text-foreground antialiased selection:bg-primary/20 selection:text-primary-foreground">
         <ThemeProvider>
           <AuthProvider>
             <ConditionalNavbar />
+
             <main className="relative flex min-h-screen flex-col bg-transparent">
               {children}
             </main>
