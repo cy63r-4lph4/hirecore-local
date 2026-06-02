@@ -62,7 +62,7 @@ function TypewriterText() {
   return (
     <span className="inline-flex items-center">
       <span className="gradient-text">{text}</span>
-      <span className="ml-1 h-[1em] w-[3px] animate-pulse rounded-full bg-primary" />
+      <span className="ml-1 h-[1em] w-0.75 animate-pulse rounded-full bg-primary" />
     </span>
   );
 }
@@ -82,7 +82,7 @@ export default function Hero() {
 
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-section-dark px-6 py-32 text-center text-section-dark-foreground">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--section-dark-foreground)/0.06)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--section-dark-foreground)/0.06)_1px,transparent_1px)] bg-[size:44px_44px]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--section-dark-foreground)/0.06)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--section-dark-foreground)/0.06)_1px,transparent_1px)] bg-size-[44px_44px]" />
 
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,hsl(var(--secondary)/0.18),transparent_35%),radial-gradient(circle_at_82%_18%,hsl(var(--primary)/0.22),transparent_40%),radial-gradient(circle_at_50%_90%,hsl(var(--primary)/0.16),transparent_45%)]" />
 
@@ -110,8 +110,6 @@ export default function Hero() {
       <div className="absolute left-1/2 top-28 h-72 w-72 -translate-x-1/2 rounded-full bg-primary/20 blur-3xl" />
 
       <div className="relative z-10 mx-auto max-w-6xl ">
-        
-
         <motion.h1
           initial={{ opacity: 0, y: 34 }}
           animate={{ opacity: 1, y: 0 }}
@@ -141,23 +139,21 @@ export default function Hero() {
         >
           <Link
             href="/tasks"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 font-semibold text-primary-foreground shadow-[var(--glow-primary)] transition hover:-translate-y-0.5 hover:bg-primary/90"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 font-semibold text-primary-foreground shadow-(--glow-primary) transition hover:-translate-y-0.5 hover:bg-primary/90"
           >
             Browse local tasks <ArrowRight className="h-4 w-4" />
           </Link>
 
           <Link
-            href="/apply-workforce"
+            href="/auth"
             className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-8 py-4 font-semibold text-section-dark-foreground backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white/15"
           >
             Become verified
           </Link>
         </motion.div>
-
-       
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-background to-transparent" />
     </section>
   );
 }

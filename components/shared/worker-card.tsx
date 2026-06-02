@@ -105,12 +105,12 @@ export function WorkerCard({ worker, className }: WorkerCardProps) {
         )}
       </div>
 
-      <p className="mt-5 line-clamp-3 min-h-[72px] text-sm leading-6 text-muted-foreground">
+      <p className="mt-5 line-clamp-3 min-h-18 text-sm leading-6 text-muted-foreground">
         {profile.bio ||
           "This worker has not added a public bio yet. Open the profile to review skills and work readiness."}
       </p>
 
-      <div className="mt-5 flex min-h-[34px] flex-wrap gap-2">
+      <div className="mt-5 flex min-h-18 flex-wrap gap-2">
         {visibleSkills.length > 0 ? (
           <>
             {visibleSkills.map((skill) => (
