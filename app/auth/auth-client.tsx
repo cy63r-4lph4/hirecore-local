@@ -24,10 +24,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import { api } from "@/lib/api/axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 type AccountType = "WORKER" | "EMPLOYER";
+
+type VerificationState = {
+  emailVerified: boolean;
+  phoneVerified: boolean;
+  contactVerified: boolean;
+  platformVerified: boolean;
+  requiresContactVerification: boolean;
+  nextStep: "VERIFY_ACCOUNT" | "DASHBOARD";
+};
 
 type AuthResponse = {
   user?: {
@@ -35,6 +45,9 @@ type AuthResponse = {
     email: string;
     fullName: string;
     accountTypes?: AccountType[];
+    emailVerifiedAt?: string | null;
+    phoneVerifiedAt?: string | null;
+    verifiedAt?: string | null;
   };
   tokens?: {
     accessToken?: string;
@@ -42,6 +55,9 @@ type AuthResponse = {
   };
   accessToken?: string;
   refreshToken?: string;
+  verification?: VerificationState;
+  requiresVerification?: boolean;
+  nextStep?: "VERIFY_ACCOUNT" | "DASHBOARD";
   message?: string | string[];
 };
 
@@ -155,41 +171,43 @@ export default function AuthClient() {
             password,
           };
 
-      const response = await fetch(`${API_URL}${endpoint}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
-
-      const data = (await response.json()) as AuthResponse;
-
-      if (!response.ok) {
-        const message = Array.isArray(data.message)
-          ? data.message.join(", ")
-          : data.message || "Authentication failed.";
-
-        throw new Error(message);
-      }
+      const { data } = await api.post<AuthResponse>(endpoint, payload);
 
       persistAuth(data);
 
+      const requiresVerification =
+        data.nextStep === "VERIFY_ACCOUNT" ||
+        data.requiresVerification === true ||
+        data.verification?.requiresContactVerification === true;
+
       toast({
-        title: isSignup ? "Welcome to HireCore" : "Welcome back",
-        description: isSignup
-          ? "Your account has been created successfully."
-          : "You are signed in.",
+        title: isSignup ? "Account created" : "Welcome back",
+        description: requiresVerification
+          ? "Verify your account to unlock core platform actions."
+          : isSignup
+            ? "Your account has been created successfully."
+            : "You are signed in.",
       });
+
+      if (requiresVerification) {
+        window.location.href = `/verify-account?redirect=${encodeURIComponent(
+          redirect,
+        )}`;
+        return;
+      }
 
       window.location.href = redirect;
     } catch (error: any) {
+      const message = Array.isArray(error?.response?.data?.message)
+        ? error.response.data.message.join(", ")
+        : error?.response?.data?.message ||
+          error?.message ||
+          "Something went wrong. Please try again.";
+
       toast({
         variant: "destructive",
         title: "Authentication failed",
-        description:
-          error?.message || "Something went wrong. Please try again.",
+        description: message,
       });
     } finally {
       setLoading(false);
@@ -225,7 +243,8 @@ export default function AuthClient() {
             width={240}
             height={64}
             priority
-            className="h-auto w-52 drop-shadow-2xl xl:w-60"
+            className="w-52 xl:w-60 drop-shadow-2xl"
+            style={{ height: "auto" }}
           />
         </div>
 
