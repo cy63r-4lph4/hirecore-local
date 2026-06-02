@@ -294,11 +294,6 @@ export default function BugReportPage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary">
-                <Sparkles className="h-3.5 w-3.5 animate-pulse text-primary" />
-                Bug Reporting
-              </div>
-
               <h1 className="bg-linear-to-b from-foreground to-foreground/80 bg-clip-text text-balance text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
                 Found a crack in the system?
               </h1>
@@ -630,9 +625,9 @@ export default function BugReportPage() {
               </h2>
 
               <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                Vague reports slow the fix. Clear reports give a trail:
-                where you went, what you clicked, what you expected, and what
-                actually happened.
+                Vague reports slow the fix. Clear reports give a trail: where
+                you went, what you clicked, what you expected, and what actually
+                happened.
               </p>
             </div>
 
@@ -680,8 +675,8 @@ export default function BugReportPage() {
 
                 <p className="mt-4 max-w-3xl text-sm leading-relaxed text-background/80 sm:text-base">
                   HireCore Local improves when users leave signal behind. Report
-                  the cracks early, and the system gets stronger before the crowd
-                  arrives.
+                  the cracks early, and the system gets stronger before the
+                  crowd arrives.
                 </p>
               </div>
 

@@ -249,7 +249,7 @@ export default function AuthClient() {
       </section>
 
       <section className="flex min-h-dvh w-full justify-center bg-neutral-950 px-3 pb-10 pt-24 sm:px-6 sm:pt-28 lg:col-span-7 lg:px-12 lg:py-16 xl:col-span-8">
-        <div className="flex w-full max-w-[38rem] flex-col justify-center">
+        <div className="flex w-full max-w-152 flex-col justify-center">
           <div className="w-full overflow-hidden rounded-3xl border-0 bg-neutral-950 p-5 shadow-none sm:p-8 lg:border lg:border-neutral-800/70 lg:bg-neutral-900/35 lg:p-10 lg:shadow-2xl lg:shadow-black/30 xl:p-12">
             <div className="space-y-8">
               <div className="space-y-2">

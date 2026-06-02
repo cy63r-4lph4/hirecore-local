@@ -184,12 +184,6 @@ export default function TasksClient() {
       {/* ── Hero ── */}
       <section className="relative z-10 px-4 pb-24 pt-32 sm:px-6 lg:pt-40">
         <div className="mx-auto max-w-5xl">
-          {/* Badge pill */}
-          <div className="mx-auto mb-8 flex w-fit items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-5 py-2 text-xs font-semibold uppercase tracking-widest text-primary backdrop-blur-xl">
-            <Sparkles className="h-3.5 w-3.5 animate-pulse" aria-hidden />
-            Live local work
-          </div>
-
           {/* Headline */}
           <h1 className="mx-auto max-w-4xl text-center text-5xl font-black leading-[1.08] tracking-[-0.04em] sm:text-6xl lg:text-7xl">
             Find verified work <span className="text-primary">near you.</span>

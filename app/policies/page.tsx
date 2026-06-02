@@ -229,7 +229,7 @@ function TiltCard({
         "transition-all duration-300 ease-out will-change-transform",
         scheme.border,
         scheme.shadow,
-        className
+        className,
       )}
     >
       {/* Decorative colored ambient backdrop blob matching specific card colors */}
@@ -240,7 +240,7 @@ function TiltCard({
           color === "info" && "bg-sky-500/20",
           color === "success" && "bg-emerald-500/20",
           color === "warning" && "bg-amber-500/20",
-          color === "destructive" && "bg-red-500/20"
+          color === "destructive" && "bg-red-500/20",
         )}
       />
       <div style={{ transform: "translateZ(30px)" }} className="relative z-10">
@@ -278,16 +278,6 @@ export default function PoliciesPage() {
       <section className="relative overflow-hidden px-4 pb-16 pt-36 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-3xl text-center">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: "spring", stiffness: 100, damping: 15 }}
-              className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-border bg-surface-soft px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-muted-foreground"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" />
-              Integrity & Operations Guide
-            </motion.div>
-
             <motion.h1
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -384,7 +374,7 @@ export default function PoliciesPage() {
                     className={cn(
                       "flex h-13 w-13 items-center justify-center rounded-2xl transition-all duration-300 group-hover:scale-110",
                       colors.bg,
-                      colors.text
+                      colors.text,
                     )}
                   >
                     <Icon className="h-6 w-6" />
@@ -396,7 +386,7 @@ export default function PoliciesPage() {
                 <h2
                   className={cn(
                     "text-2xl font-black tracking-tight transition-colors duration-200",
-                    colors.text
+                    colors.text,
                   )}
                 >
                   {policy.title}
@@ -412,14 +402,18 @@ export default function PoliciesPage() {
                     <motion.div
                       key={point}
                       whileHover={{ x: 4 }}
-                      transition={{ type: "spring", stiffness: 200, damping: 12 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 12,
+                      }}
                       className="flex items-start gap-3 group/item cursor-default"
                     >
                       <div
                         className={cn(
                           "mt-1 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-md transition-colors",
                           colors.bulletBg,
-                          colors.bulletText
+                          colors.bulletText,
                         )}
                       >
                         <ShieldCheck className="h-3 w-3" />
@@ -445,7 +439,7 @@ export default function PoliciesPage() {
         >
           {/* Subtle grid accent behind bottom block */}
           <div className="absolute inset-0 opacity-5 bg-[linear-gradient(to_right,#000_1px,transparent_1px),linear-gradient(to_bottom,#000_1px,transparent_1px)] bg-size-[2rem_2rem]" />
-          
+
           <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center relative z-10">
             <div>
               <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-background/15 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.22em] text-background/80">
@@ -458,10 +452,10 @@ export default function PoliciesPage() {
               </h2>
 
               <p className="mt-4 max-w-3xl text-sm leading-7 text-background/80 sm:text-base">
-                HireCore Local is still growing. These policies should guide
-                the platform now, but they should become more formal as the
-                product gets real users, payments, disputes, verification, and
-                stronger legal requirements.
+                HireCore Local is still growing. These policies should guide the
+                platform now, but they should become more formal as the product
+                gets real users, payments, disputes, verification, and stronger
+                legal requirements.
               </p>
             </div>
 

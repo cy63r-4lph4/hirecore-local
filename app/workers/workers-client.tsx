@@ -18,7 +18,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useWorkers } from "@/hooks/useWorkers";
-import { WorkerCard, WorkerCardSkeleton } from "@/components/shared/worker-card";
+import {
+  WorkerCard,
+  WorkerCardSkeleton,
+} from "@/components/shared/worker-card";
 
 type DiscoveryFilters = {
   available: boolean;
@@ -58,12 +61,15 @@ export default function WorkersClient() {
   const keyword = searchParams.get("q") ?? "";
   const location = searchParams.get("loc") ?? "";
   const page = Math.max(1, Number(searchParams.get("page") ?? "1"));
-  
-  const filters = useMemo<DiscoveryFilters>(() => ({
-    available: searchParams.get("available") === "true",
-    verified: searchParams.get("verified") === "true",
-    workforce: searchParams.get("workforce") === "true",
-  }), [searchParams]);
+
+  const filters = useMemo<DiscoveryFilters>(
+    () => ({
+      available: searchParams.get("available") === "true",
+      verified: searchParams.get("verified") === "true",
+      workforce: searchParams.get("workforce") === "true",
+    }),
+    [searchParams],
+  );
 
   // Buffers for uncontrolled input changes until submitted
   const [draftKeyword, setDraftKeyword] = useState(keyword);
@@ -76,7 +82,12 @@ export default function WorkersClient() {
   }, [keyword, location]);
 
   // 2. Fetch workers matching URL state boundaries
-  const { workers = [], meta, loading, error } = useWorkers({
+  const {
+    workers = [],
+    meta,
+    loading,
+    error,
+  } = useWorkers({
     keyword: keyword || undefined,
     location: location || undefined,
     available: filters.available ? true : undefined,
@@ -90,13 +101,14 @@ export default function WorkersClient() {
     return Object.values(filters).filter(Boolean).length;
   }, [filters]);
 
-  const hasSearchState = Boolean(keyword) || Boolean(location) || activeFilterCount > 0;
+  const hasSearchState =
+    Boolean(keyword) || Boolean(location) || activeFilterCount > 0;
   const isSearchingOrLoading = loading || isPending;
 
   // 3. Centralized router engine to batch filter modifications smoothly
   const updateQueryParams = (updates: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString());
-    
+
     Object.entries(updates).forEach(([key, value]) => {
       if (value === null || value === "" || value === "false") {
         params.delete(key);
@@ -107,7 +119,7 @@ export default function WorkersClient() {
 
     startTransition(() => {
       router.push(`${pathname}?${params.toString()}`);
-      
+
       // Target viewport adjustment to keep results focused without fully resetting header
       const targetElement = document.getElementById("results-anchor");
       if (targetElement) {
@@ -137,13 +149,17 @@ export default function WorkersClient() {
   function clearDiscoveryState() {
     setDraftKeyword("");
     setDraftLocation("");
-    
+
     // Wipe clean all search attributes
-    const parametersToClear: Record<string, null> = { q: null, loc: null, page: null };
+    const parametersToClear: Record<string, null> = {
+      q: null,
+      loc: null,
+      page: null,
+    };
     FILTER_OPTIONS.forEach(({ key }) => {
       parametersToClear[key] = null;
     });
-    
+
     updateQueryParams(parametersToClear);
   }
 
@@ -157,17 +173,13 @@ export default function WorkersClient() {
         <div className="mx-auto max-w-7xl px-4 pb-10 pt-32 sm:px-6 lg:px-8 lg:pt-40">
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-end">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground shadow-sm">
-                <UsersRound className="h-3.5 w-3.5 text-primary" />
-                Worker discovery
-              </div>
-
               <h1 className="mt-5 max-w-4xl text-4xl font-black tracking-[-0.05em] sm:text-5xl lg:text-6xl">
                 Find people worth trusting with the work.
               </h1>
 
               <p className="mt-5 max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
-                Search verified local workers by skill, location, availability, and HireCore workforce status. No noise. Just useful signals.
+                Search verified local workers by skill, location, availability,
+                and HireCore workforce status. No noise. Just useful signals.
               </p>
             </div>
 
@@ -177,9 +189,12 @@ export default function WorkersClient() {
                   <BriefcaseBusiness className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold">Better worker matching</p>
+                  <p className="text-sm font-semibold">
+                    Better worker matching
+                  </p>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Narrow results before opening profiles, instead of browsing blind.
+                    Narrow results before opening profiles, instead of browsing
+                    blind.
                   </p>
                 </div>
               </div>
@@ -219,7 +234,9 @@ export default function WorkersClient() {
                 disabled={isSearchingOrLoading}
                 className="h-14 rounded-2xl px-7 text-sm font-semibold disabled:opacity-70 transition-opacity"
               >
-                {isSearchingOrLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isSearchingOrLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Search workers
               </Button>
             </div>
@@ -269,7 +286,9 @@ export default function WorkersClient() {
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="mb-7 flex flex-col gap-4 border-b border-border/70 pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-2xl font-black tracking-tight">Worker network</h2>
+            <h2 className="text-2xl font-black tracking-tight">
+              Worker network
+            </h2>
             <p className="mt-1 text-sm text-muted-foreground">
               {isSearchingOrLoading
                 ? "Updating network roster..."
@@ -282,19 +301,22 @@ export default function WorkersClient() {
             <div className="flex flex-wrap gap-2 text-xs">
               {keyword && (
                 <span className="rounded-full border border-border bg-card px-3 py-1.5 text-muted-foreground">
-                  Search: <strong className="text-foreground">"{keyword}"</strong>
+                  Search:{" "}
+                  <strong className="text-foreground">"{keyword}"</strong>
                 </span>
               )}
 
               {location && (
                 <span className="rounded-full border border-border bg-card px-3 py-1.5 text-muted-foreground">
-                  Location: <strong className="text-foreground">"{location}"</strong>
+                  Location:{" "}
+                  <strong className="text-foreground">"{location}"</strong>
                 </span>
               )}
 
               {activeFilterCount > 0 && (
                 <span className="rounded-full border border-border bg-card px-3 py-1.5 text-muted-foreground">
-                  {activeFilterCount} active {activeFilterCount === 1 ? "filter" : "filters"}
+                  {activeFilterCount} active{" "}
+                  {activeFilterCount === 1 ? "filter" : "filters"}
                 </span>
               )}
             </div>
@@ -302,7 +324,10 @@ export default function WorkersClient() {
         </div>
 
         {error && (
-          <div role="alert" className="mb-6 rounded-3xl border border-destructive/20 bg-destructive/10 p-5 text-sm text-destructive">
+          <div
+            role="alert"
+            className="mb-6 rounded-3xl border border-destructive/20 bg-destructive/10 p-5 text-sm text-destructive"
+          >
             {error}
           </div>
         )}
@@ -325,8 +350,12 @@ export default function WorkersClient() {
             {totalPages > 1 && (
               <div className="mt-10 flex items-center justify-between rounded-3xl border border-border bg-card p-4">
                 <p className="text-sm text-muted-foreground">
-                  Page <span className="font-semibold text-foreground">{page}</span> of{" "}
-                  <span className="font-semibold text-foreground">{totalPages}</span>
+                  Page{" "}
+                  <span className="font-semibold text-foreground">{page}</span>{" "}
+                  of{" "}
+                  <span className="font-semibold text-foreground">
+                    {totalPages}
+                  </span>
                 </p>
 
                 <div className="flex items-center gap-2">
@@ -334,7 +363,9 @@ export default function WorkersClient() {
                     variant="outline"
                     className="rounded-full"
                     disabled={page <= 1}
-                    onClick={() => updateQueryParams({ page: String(page - 1) })}
+                    onClick={() =>
+                      updateQueryParams({ page: String(page - 1) })
+                    }
                   >
                     <ChevronLeft className="mr-1 h-4 w-4" />
                     Previous
@@ -344,7 +375,9 @@ export default function WorkersClient() {
                     variant="outline"
                     className="rounded-full"
                     disabled={page >= totalPages}
-                    onClick={() => updateQueryParams({ page: String(page + 1) })}
+                    onClick={() =>
+                      updateQueryParams({ page: String(page + 1) })
+                    }
                   >
                     Next
                     <ChevronRight className="ml-1 h-4 w-4" />
@@ -360,9 +393,12 @@ export default function WorkersClient() {
               <Search className="h-6 w-6 text-muted-foreground" />
             </div>
 
-            <h3 className="mt-5 text-xl font-black tracking-tight">No workers matched that search</h3>
+            <h3 className="mt-5 text-xl font-black tracking-tight">
+              No workers matched that search
+            </h3>
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-              Loosen the filters, try a broader location query, or search by a more general skill category.
+              Loosen the filters, try a broader location query, or search by a
+              more general skill category.
             </p>
 
             {hasSearchState && (
