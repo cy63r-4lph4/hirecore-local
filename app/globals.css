@@ -290,8 +290,11 @@ body {
 }
 
 @keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
   to {
-    transform: translateX(calc(-50% - 0.75rem));
+    transform: translateX(-50%);
   }
 }
 

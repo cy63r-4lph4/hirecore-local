@@ -35,7 +35,6 @@ const WORK_TYPES = [
   { name: "Cook", image: "/images/work-types/cook.jpeg" },
 ];
 
-// Extracted Sub-component for individual card tracking logic
 function WorkTypeCard({
   type,
   index,
@@ -45,32 +44,21 @@ function WorkTypeCard({
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // 3D Tilt Values
   const rotateX = useMotionValue(0);
   const rotateY = useMotionValue(0);
-
-  // Hover Glow Coordinates
   const mouseX = useMotionValue(-1000);
   const mouseY = useMotionValue(-1000);
 
-  // Smooth Springs for fluid movement
   const smoothRotateX = useSpring(rotateX, springConfig);
   const smoothRotateY = useSpring(rotateY, springConfig);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
-
     const rect = cardRef.current.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-
-    const relativeX = (e.clientX - rect.left) / width - 0.5;
-    const relativeY = (e.clientY - rect.top) / height - 0.5;
-
-    // Tilt angle intensity modifier
+    const relativeX = (e.clientX - rect.left) / rect.width - 0.5;
+    const relativeY = (e.clientY - rect.top) / rect.height - 0.5;
     rotateX.set(-relativeY * 12);
     rotateY.set(relativeX * 12);
-
     mouseX.set(e.clientX - rect.left);
     mouseY.set(e.clientY - rect.top);
   };
@@ -82,27 +70,13 @@ function WorkTypeCard({
     mouseY.set(-1000);
   };
 
-  // Dynamic inline-style templates for the lighting spotlights
-  const glowBg = useMotionTemplate`
-    radial-gradient(
-      200px circle at ${mouseX}px ${mouseY}px,
-      hsl(var(--primary) / 0.12),
-      transparent 80%
-    )
-  `;
-
-  const borderGlowBg = useMotionTemplate`
-    radial-gradient(
-      100px circle at ${mouseX}px ${mouseY}px,
-      hsl(var(--primary) / 0.4),
-      transparent 60%
-    )
-  `;
+  const glowBg = useMotionTemplate`radial-gradient(200px circle at ${mouseX}px ${mouseY}px, hsl(var(--primary) / 0.12), transparent 80%)`;
+  const borderGlowBg = useMotionTemplate`radial-gradient(100px circle at ${mouseX}px ${mouseY}px, hsl(var(--primary) / 0.4), transparent 60%)`;
 
   return (
+    // ✅ Plain motion.div with NO fadeUp — no whileInView, no initial opacity:0
     <motion.div
       ref={cardRef}
-      {...fadeUp}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{
@@ -136,7 +110,6 @@ function WorkTypeCard({
         style={{ transform: "translateZ(15px)" }}
         className="relative z-10 transition-transform duration-500"
       >
-        {/* Media Block */}
         <div className="relative h-60 w-full overflow-hidden">
           <Image
             src={type.image}
@@ -146,27 +119,20 @@ function WorkTypeCard({
             sizes="220px"
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
           />
-          {/* Subtle Deepening Gradient overlay */}
           <div className="absolute inset-0 bg-linear-to-t from-background/90 via-background/15 to-transparent transition-opacity duration-500 group-hover:from-background/95" />
-
-          {/* Dynamic Status Badge */}
           <span className="absolute top-4 left-4 scale-90 rounded-full bg-background/50 px-2.5 py-1 text-[10px] font-semibold text-foreground/80 backdrop-blur-md opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100">
             Available Now
           </span>
         </div>
 
-        {/* Info Block */}
         <div className="p-4 text-left">
           <h3 className="text-sm font-black text-foreground transition-colors duration-300 group-hover:text-primary">
             {type.name}
           </h3>
-
           <div className="mt-1 flex items-center justify-between">
             <p className="text-xs text-muted-foreground transition-transform duration-500 group-hover:translate-x-0.5">
               Verified local skill
             </p>
-
-            {/* Sliding Link Indicator */}
             <ArrowRight className="h-3.5 w-3.5 -translate-x-2 text-primary opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100" />
           </div>
         </div>
@@ -195,11 +161,14 @@ export default function HomePage() {
           </h2>
         </div>
 
-        <InfiniteScroller speed="slow" className="relative mx-auto max-w-6xl">
-          {WORK_TYPES.map((type, index) => (
-            <WorkTypeCard key={type.name} type={type} index={index} />
-          ))}
-        </InfiniteScroller>
+        {/* ✅ fadeUp wraps the whole scroller, not individual cards */}
+        <motion.div {...fadeUp}>
+          <InfiniteScroller speed="fast" className="relative mx-auto max-w-6xl">
+            {WORK_TYPES.map((type, index) => (
+              <WorkTypeCard key={type.name} type={type} index={index} />
+            ))}
+          </InfiniteScroller>
+        </motion.div>
       </section>
 
       <SectionDivider flip />
@@ -213,7 +182,6 @@ export default function HomePage() {
             <p className="mb-4 text-sm font-semibold uppercase tracking-[0.3em] text-primary">
               How it works
             </p>
-
             <h2 className="mx-auto mb-16 max-w-3xl text-4xl font-black tracking-tight text-foreground md:text-5xl">
               From request to completed — in minutes
             </h2>
@@ -233,11 +201,9 @@ export default function HomePage() {
                 <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-sm font-bold text-primary">
                   {n}
                 </div>
-
                 <div className="mb-3 text-xl font-bold text-card-foreground">
                   {t}
                 </div>
-
                 <p className="text-sm leading-6 text-muted-foreground">{d}</p>
               </motion.div>
             ))}
@@ -261,7 +227,6 @@ export default function HomePage() {
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
             />
-
             <div className="absolute inset-0 bg-linear-to-t from-black/45 via-transparent to-transparent" />
           </motion.div>
 
@@ -269,16 +234,13 @@ export default function HomePage() {
             <p className="mb-4 text-sm font-semibold uppercase tracking-[0.3em] text-primary">
               For workers
             </p>
-
             <h3 className="mb-6 text-4xl font-black tracking-tight md:text-5xl">
               Get paid for skills you already have
             </h3>
-
             <p className="mb-10 max-w-xl text-section-dark-foreground/70">
               HireCore helps skilled local workers find trusted tasks, build a
               visible reputation, and earn without the usual chaos.
             </p>
-
             <ul className="grid gap-4 sm:grid-cols-2">
               {[
                 "Free to join",
@@ -309,16 +271,13 @@ export default function HomePage() {
           <p className="mb-4 text-sm font-semibold uppercase tracking-[0.3em] text-primary">
             Ready when you are
           </p>
-
           <h2 className="mb-6 text-4xl font-black tracking-tight text-foreground md:text-6xl">
             The future of local work is already here
           </h2>
-
           <p className="mx-auto mb-10 max-w-2xl text-muted-foreground">
             Join a trusted network built for speed, verification, and reliable
             work opportunities.
           </p>
-
           <Link
             href="/auth"
             className="inline-flex items-center gap-2 rounded-full bg-primary px-10 py-5 font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition hover:-translate-y-0.5 hover:shadow-xl"

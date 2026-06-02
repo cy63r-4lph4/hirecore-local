@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -9,6 +11,12 @@ type InfiniteScrollerProps = {
   className?: string;
 };
 
+const SPEED_MAP: Record<NonNullable<InfiniteScrollerProps["speed"]>, string> = {
+  slow: "120s",
+  normal: "60s",
+  fast: "20s",
+};
+
 export const InfiniteScroller: React.FC<InfiniteScrollerProps> = ({
   children,
   direction = "left",
@@ -16,74 +24,60 @@ export const InfiniteScroller: React.FC<InfiniteScrollerProps> = ({
   pauseOnHover = true,
   className,
 }) => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const scrollerRef = useRef<HTMLDivElement | null>(null);
-  const [start, setStart] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [ready, setReady] = useState(false);
 
-  // 1. Properly handle dependencies so this doesn't run on every single render
+  // Clone items once on mount
   useEffect(() => {
-    addAnimation();
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+
+    // Guard: never double-clone
+    if (scroller.dataset.cloned === "true") return;
+
+    const items = Array.from(scroller.children);
+    if (items.length === 0) return;
+
+    items.forEach((item) => {
+      const clone = item.cloneNode(true) as HTMLElement;
+      clone.setAttribute("aria-hidden", "true");
+      scroller.appendChild(clone);
+    });
+
+    scroller.dataset.cloned = "true";
+    setReady(true);
+  }, []);
+
+  // Apply direction & speed via CSS custom properties
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    container.style.setProperty(
+      "--animation-direction",
+      direction === "left" ? "normal" : "reverse",
+    );
+    container.style.setProperty(
+      "--animation-duration",
+      SPEED_MAP[speed] ?? "120s",
+    );
   }, [direction, speed]);
-
-  const addAnimation = () => {
-    if (containerRef.current && scrollerRef.current) {
-      // 2. Prevent duplicate cloning if useEffect triggers again
-      if (scrollerRef.current.getAttribute("data-cloned") === "true") {
-        getDirection();
-        getSpeed();
-        setStart(true);
-        return;
-      }
-
-      const scrollerContent = Array.from(scrollerRef.current.children);
-
-      scrollerContent.forEach((item) => {
-        const duplicatedItem = item.cloneNode(true) as HTMLElement;
-        // Hide duplicates from screen readers for accessibility
-        duplicatedItem.setAttribute("aria-hidden", "true");
-        scrollerRef.current?.appendChild(duplicatedItem);
-      });
-
-      // Mark as cloned so we never double-clone
-      scrollerRef.current.setAttribute("data-cloned", "true");
-
-      getDirection();
-      getSpeed();
-      setStart(true);
-    }
-  };
-
-  const getDirection = () => {
-    if (containerRef.current) {
-      containerRef.current.style.setProperty(
-        "--animation-direction",
-        direction === "left" ? "forwards" : "reverse",
-      );
-    }
-  };
-
-  const getSpeed = () => {
-    if (containerRef.current) {
-      let duration = "120s";
-      if (speed === "fast") duration = "20s";
-      else if (speed === "normal") duration = "80s";
-      containerRef.current.style.setProperty("--animation-duration", duration);
-    }
-  };
 
   return (
     <div
       ref={containerRef}
       className={cn(
-        "scroller relative z-20 overflow-hidden mask-[linear-gradient(to_right,transparent,white_10%,white_90%,transparent)]",
+        "scroller relative overflow-hidden",
+        "mask-[linear-gradient(to_right,transparent,white_12%,white_88%,transparent)]",
         className,
       )}
     >
       <div
         ref={scrollerRef}
         className={cn(
-          "flex min-w-full shrink-0 gap-6 py-4 w-max flex-nowrap",
-          start && "animate-scroll",
+          "flex w-max flex-nowrap gap-6 py-4",
+          ready && "animate-scroll",
           pauseOnHover && "hover:paused",
         )}
       >
