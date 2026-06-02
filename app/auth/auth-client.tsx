@@ -48,6 +48,8 @@ type AuthResponse = {
     emailVerifiedAt?: string | null;
     phoneVerifiedAt?: string | null;
     verifiedAt?: string | null;
+    mustChangePassword?: boolean;
+    passwordChangedAt?: string | null;
   };
   tokens?: {
     accessToken?: string;
@@ -57,7 +59,8 @@ type AuthResponse = {
   refreshToken?: string;
   verification?: VerificationState;
   requiresVerification?: boolean;
-  nextStep?: "VERIFY_ACCOUNT" | "DASHBOARD";
+  forcePasswordChange?: boolean;
+  nextStep?: "VERIFY_ACCOUNT" | "DASHBOARD" | "CHANGE_PASSWORD";
   message?: string | string[];
 };
 
@@ -175,19 +178,26 @@ export default function AuthClient() {
 
       persistAuth(data);
 
+      const forcePasswordChange =
+        data.nextStep === "CHANGE_PASSWORD" ||
+        data.forcePasswordChange === true;
+
+      if (forcePasswordChange) {
+        toast({
+          title: "Password change required",
+          description: "Change your temporary password to continue.",
+        });
+
+        window.location.href = `/auth/change-password?redirect=${encodeURIComponent(
+          redirect,
+        )}`;
+        return;
+      }
+
       const requiresVerification =
         data.nextStep === "VERIFY_ACCOUNT" ||
         data.requiresVerification === true ||
         data.verification?.requiresContactVerification === true;
-
-      toast({
-        title: isSignup ? "Account created" : "Welcome back",
-        description: requiresVerification
-          ? "Verify your account to unlock core platform actions."
-          : isSignup
-            ? "Your account has been created successfully."
-            : "You are signed in.",
-      });
 
       if (requiresVerification) {
         window.location.href = `/verify-account?redirect=${encodeURIComponent(
