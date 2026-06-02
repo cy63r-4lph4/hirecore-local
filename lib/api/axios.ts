@@ -63,7 +63,9 @@ function shouldSkipRefresh(url?: string) {
     url.includes("/auth/register") ||
     url.includes("/auth/refresh") ||
     url.includes("/auth/password/forgot") ||
-    url.includes("/auth/password/reset")
+    url.includes("/auth/password/reset") ||
+    url.includes("/auth/email-verify") ||
+    url.includes("/auth/email-verification-otp")
   );
 }
 
