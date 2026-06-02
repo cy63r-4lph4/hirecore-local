@@ -163,7 +163,7 @@ export default function HomePage() {
 
         {/* ✅ fadeUp wraps the whole scroller, not individual cards */}
         <motion.div {...fadeUp}>
-          <InfiniteScroller speed="fast" className="relative mx-auto max-w-6xl">
+          <InfiniteScroller speed="normal" className="relative mx-auto max-w-6xl">
             {WORK_TYPES.map((type, index) => (
               <WorkTypeCard key={type.name} type={type} index={index} />
             ))}
