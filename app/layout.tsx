@@ -19,10 +19,20 @@ const inter = Inter({
   display: "swap",
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_APP_URL || "https://gh.hirecore.org";
+
 export const metadata: Metadata = {
-  title: "HireCore Local - Find Local Work",
+  metadataBase: new URL(siteUrl),
+
+  title: {
+    default: "HireCore Local - Find Local Work",
+    template: "%s | HireCore Local",
+  },
+
   description:
-    "A controlled workforce marketplace connecting skilled workers with local opportunities.",
+    "A controlled workforce marketplace connecting skilled workers with trusted local opportunities.",
+
   keywords: ["jobs", "local work", "workforce", "marketplace", "hire"],
 
   icons: {
@@ -59,8 +69,27 @@ export const metadata: Metadata = {
 
   openGraph: {
     title: "HireCore Local",
-    description: "Find verified local work opportunities.",
+    description:
+      "Find trusted local work opportunities reviewed through HireCore Local.",
+    url: siteUrl,
+    siteName: "HireCore Local",
     type: "website",
+    images: [
+      {
+        url: "/hirecore-local.png",
+        width: 1200,
+        height: 630,
+        alt: "HireCore Local - Trusted local work near you",
+      },
+    ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "HireCore Local",
+    description:
+      "Find trusted local work opportunities reviewed through HireCore Local.",
+    images: ["/hirecore-local.png"],
   },
 };
 
