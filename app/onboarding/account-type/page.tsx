@@ -264,7 +264,7 @@ export default function AccountTypeOnboardingPage() {
 
           <h1 className="mt-7 max-w-2xl text-5xl font-black leading-[1.05] tracking-tight">
             One account.{" "}
-            <span className="bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
               Choose how you move.
             </span>
           </h1>
@@ -276,7 +276,7 @@ export default function AccountTypeOnboardingPage() {
             front of you.
           </p>
 
-          <div className="mt-8 rounded-[2rem] border border-primary/20 bg-primary/[0.08] p-6 shadow-sm backdrop-blur-xl">
+          <div className="mt-8 rounded-[2rem] border border-primary/20 bg-primary/8 p-6 shadow-sm backdrop-blur-xl">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
                 <ShieldCheck className="h-5 w-5" />
@@ -353,7 +353,7 @@ export default function AccountTypeOnboardingPage() {
                     onClick={() => toggleAccountType(option.value)}
                     className={`group relative overflow-hidden rounded-[1.75rem] border p-5 text-left transition ${
                       selected
-                        ? "border-primary bg-primary/[0.12] shadow-xl shadow-primary/10"
+                        ? "border-primary bg-primary/12 shadow-xl shadow-primary/10"
                         : "border-border bg-background/70 hover:-translate-y-1 hover:border-primary/40 hover:bg-card"
                     }`}
                   >
@@ -388,7 +388,7 @@ export default function AccountTypeOnboardingPage() {
             </div>
 
             {selectedTypes.includes("WORKER") && (
-              <div className="mt-5 rounded-[1.75rem] border border-primary/20 bg-primary/[0.08] p-5">
+              <div className="mt-5 rounded-[1.75rem] border border-primary/20 bg-primary/8 p-5">
                 <div className="flex gap-3">
                   <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
                     <ShieldCheck className="h-4 w-4" />
@@ -437,7 +437,7 @@ function BackgroundGlow() {
   return (
     <div className="pointer-events-none absolute inset-0">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,hsl(var(--primary)/0.22),transparent_32%),radial-gradient(circle_at_84%_82%,hsl(var(--secondary)/0.18),transparent_34%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.15)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.15)_1px,transparent_1px)] bg-[size:72px_72px] opacity-40" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.15)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.15)_1px,transparent_1px)] bg-size-[72px_72px] opacity-40" />
     </div>
   );
 }

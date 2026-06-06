@@ -124,7 +124,8 @@ function absoluteImageUrl(url?: string | null) {
     return url;
   }
 
-  const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
+  const apiBase =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
   const origin = apiBase.replace(/\/api\/?$/, "");
 
   return `${origin}${url}`;
@@ -462,7 +463,7 @@ export default function ProfilePage() {
 
   const isWorkforceMember = Boolean(
     capabilities.isWorkforceMember ||
-      profileUser.workerProfile?.isWorkforceMember,
+    profileUser.workerProfile?.isWorkforceMember,
   );
 
   const workerVerified = Boolean(
@@ -470,8 +471,7 @@ export default function ProfilePage() {
   );
 
   const employerVerified = Boolean(
-    capabilities.isEmployerVerified ||
-      profileUser.employerProfile?.isVerified,
+    capabilities.isEmployerVerified || profileUser.employerProfile?.isVerified,
   );
 
   const workerTrust =
@@ -519,7 +519,7 @@ export default function ProfilePage() {
               className="lg:sticky lg:top-24 lg:self-start"
             >
               <div className="overflow-hidden rounded-[2.75rem] border border-border bg-card/90 shadow-2xl shadow-black/5 backdrop-blur-3xl dark:bg-card/35">
-                <div className="relative h-36 overflow-hidden bg-gradient-to-br from-primary/25 via-primary/10 to-secondary/20">
+                <div className="relative h-36 overflow-hidden bg-linear-to-br from-primary/25 via-primary/10 to-secondary/20">
                   <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
                   <div className="absolute -bottom-14 left-0 h-36 w-36 rounded-full bg-secondary/20 blur-3xl" />
                 </div>
@@ -529,7 +529,7 @@ export default function ProfilePage() {
                     <div className="relative">
                       <div className="absolute inset-0 rounded-[2.25rem] bg-primary/25 blur-2xl" />
 
-                      <div className="relative flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.25rem] border-4 border-card bg-gradient-to-tr from-primary to-secondary text-4xl font-black text-white shadow-2xl">
+                      <div className="relative flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.25rem] border-4 border-card bg-linear-to-tr from-primary to-secondary text-4xl font-black text-white shadow-2xl">
                         {profileImageUrl ? (
                           <Image
                             src={profileImageUrl}
@@ -575,7 +575,7 @@ export default function ProfilePage() {
                   <Button
                     type="button"
                     onClick={() => setEditOpen(true)}
-                    className="mt-7 h-12 w-full rounded-full bg-primary text-primary-foreground shadow-[var(--glow-primary)]"
+                    className="mt-7 h-12 w-full rounded-full bg-primary text-primary-foreground shadow-(--glow-primary)"
                   >
                     <Camera className="mr-2 h-4 w-4" />
                     Update profile
@@ -647,7 +647,7 @@ export default function ProfilePage() {
 
                   <h2 className="mt-6 max-w-4xl text-4xl font-black leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
                     Your identity is becoming{" "}
-                    <span className="bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
+                    <span className="bg-linear-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
                       discoverable trust.
                     </span>
                   </h2>
@@ -1027,7 +1027,7 @@ function ProfileEditModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-background/75 px-4 py-8 backdrop-blur-xl">
+    <div className="fixed inset-0 z-90 flex items-center justify-center bg-background/75 px-4 py-8 backdrop-blur-xl">
       <button
         type="button"
         aria-label="Close profile editor"
@@ -1185,7 +1185,7 @@ function JourneyStep({
   return (
     <div className="relative flex gap-5 pb-7">
       {!last && (
-        <div className="absolute left-[21px] top-11 h-[calc(100%-22px)] w-px bg-gradient-to-b from-border via-border to-transparent" />
+        <div className="absolute left-5.25 top-11 h-[calc(100%-22px)] w-px bg-linear-to-b from-border via-border to-transparent" />
       )}
 
       <div
@@ -1383,7 +1383,7 @@ function BackgroundGlow() {
   return (
     <div className="pointer-events-none fixed inset-0 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,hsl(var(--primary)/0.18),transparent_30%),radial-gradient(circle_at_88%_80%,hsl(var(--secondary)/0.16),transparent_32%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.15)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.15)_1px,transparent_1px)] bg-[size:80px_80px] opacity-40" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.15)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.15)_1px,transparent_1px)] bg-size-[80px_80px] opacity-40" />
     </div>
   );
 }
