@@ -25,6 +25,7 @@ import {
   Share2,
   ShieldCheck,
   Sparkles,
+  UserRound,
   Wallet,
 } from "lucide-react";
 
@@ -32,6 +33,7 @@ import { getJob } from "@/lib/api/jobs";
 import { useAuth } from "@/providers/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { ApplicationModal } from "@/components/applications/ApplicationModal";
+import { GetWorkerProfileModal } from "@/components/profile/GetWorkerProfileModal";
 
 type Job = any;
 
@@ -103,7 +105,7 @@ function isHireCoreSystemTask(job: Job) {
 
 function getTaskSummary(job: Job) {
   if (isHireCoreSystemTask(job)) {
-    return `HireCore Local is helping a nearby business find a reliable worker for this role. Apply only if you match the skills, location, and availability needed for the work.`;
+    return "HireCore Local is helping a nearby business find a reliable worker for this role. Apply only if you match the skills, location, and availability needed for the work.";
   }
 
   const description = String(job?.description || "")
@@ -128,6 +130,8 @@ function extractNearbyAreas(description?: string | null) {
     "Nima",
     "Kokomlemle",
     "ATTC",
+    "BlueCrest",
+    "Adabraka",
   ];
 
   return knownAreas.filter((area) =>
@@ -152,7 +156,19 @@ function getApplicationLabel(job: Job) {
   return "Apply now";
 }
 
-export default function TaskDetailPage() {
+function userHasWorkerPath(user: any) {
+  return Boolean(
+    user?.capabilities?.isWorker ||
+    user?.accountTypes?.includes?.("WORKER") ||
+    user?.workerProfile,
+  );
+}
+
+function userHasWorkerProfile(user: any) {
+  return Boolean(user?.workerProfile?.id || user?.workerProfile);
+}
+
+export default function TaskDetailClient() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
 
@@ -164,6 +180,7 @@ export default function TaskDetailPage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [applicationOpen, setApplicationOpen] = useState(false);
+  const [workerProfileOpen, setWorkerProfileOpen] = useState(false);
 
   const loadJob = useCallback(async () => {
     if (!jobId) return;
@@ -193,7 +210,13 @@ export default function TaskDetailPage() {
 
   const isOpen = job?.status === "OPEN";
   const hasApplied = Boolean(job?.viewer?.hasApplied);
-  const isWorker = Boolean(user?.capabilities?.isWorker || user?.workerProfile);
+
+  const hasWorkerPath = userHasWorkerPath(user);
+  const hasWorkerProfile = userHasWorkerProfile(user);
+
+  const needsWorkerProfile = Boolean(
+    authenticated && (!hasWorkerPath || !hasWorkerProfile),
+  );
 
   const isJobOwner = Boolean(
     user?.id && job?.employer?.id && user.id === job.employer.id,
@@ -202,10 +225,12 @@ export default function TaskDetailPage() {
   const employerName = useMemo(() => getEmployerName(job), [job]);
   const hireCoreManaged = useMemo(() => isHireCoreSystemTask(job), [job]);
   const summary = useMemo(() => getTaskSummary(job), [job]);
+
   const nearbyAreas = useMemo(
     () => extractNearbyAreas(job?.description),
     [job?.description],
   );
+
   const skills = useMemo(
     () => extractSkillBullets(job?.description),
     [job?.description],
@@ -215,12 +240,9 @@ export default function TaskDetailPage() {
     if (!isOpen) return "This task is no longer open.";
     if (hasApplied) return "You have already applied to this task.";
     if (isJobOwner) return "You cannot apply to your own task.";
-    if (authenticated && !isWorker) {
-      return "Only worker profiles can apply to tasks.";
-    }
 
     return null;
-  }, [isOpen, hasApplied, isJobOwner, authenticated, isWorker]);
+  }, [isOpen, hasApplied, isJobOwner]);
 
   const handleApplyClick = () => {
     if (!jobId) return;
@@ -230,9 +252,22 @@ export default function TaskDetailPage() {
       return;
     }
 
+    if (needsWorkerProfile) {
+      setWorkerProfileOpen(true);
+      return;
+    }
+
     if (applyDisabledReason) return;
 
     setApplicationOpen(true);
+  };
+
+  const handleWorkerProfileSuccess = () => {
+    setWorkerProfileOpen(false);
+
+    if (!applyDisabledReason) {
+      setApplicationOpen(true);
+    }
   };
 
   if (loading || authLoading) {
@@ -280,13 +315,17 @@ export default function TaskDetailPage() {
                 <MyApplicationCard application={job.viewer.myApplication} />
               )}
 
-              <ApplicationRequirementCard hireCoreManaged={hireCoreManaged} />
+              <ApplicationRequirementCard
+                hireCoreManaged={hireCoreManaged}
+                needsWorkerProfile={needsWorkerProfile}
+              />
             </div>
 
             <aside className="space-y-5 lg:sticky lg:top-28 lg:self-start">
               <ApplyCard
                 job={job}
                 authenticated={authenticated}
+                needsWorkerProfile={needsWorkerProfile}
                 applyDisabledReason={applyDisabledReason}
                 onApply={handleApplyClick}
               />
@@ -308,6 +347,13 @@ export default function TaskDetailPage() {
         jobTitle={job.title}
         onClose={() => setApplicationOpen(false)}
         onSuccess={loadJob}
+      />
+
+      <GetWorkerProfileModal
+        open={workerProfileOpen}
+        onClose={() => setWorkerProfileOpen(false)}
+        onSuccess={handleWorkerProfileSuccess}
+        reason="Only worker profiles can apply for tasks. Create your worker profile now, then continue your application."
       />
     </>
   );
@@ -612,12 +658,14 @@ function MyApplicationCard({ application }: { application: any }) {
         <BadgeCheck className="mt-1 h-5 w-5 shrink-0 text-primary" />
         <div>
           <h3 className="font-black">Your application</h3>
+
           <p className="mt-1 text-sm leading-6 text-muted-foreground">
             Status:{" "}
             <span className="font-bold text-foreground">
               {application.status}
             </span>
           </p>
+
           <p className="mt-1 text-sm leading-6 text-muted-foreground">
             Submitted on {formatDate(application.createdAt)}
           </p>
@@ -629,21 +677,31 @@ function MyApplicationCard({ application }: { application: any }) {
 
 function ApplicationRequirementCard({
   hireCoreManaged,
+  needsWorkerProfile,
 }: {
   hireCoreManaged: boolean;
+  needsWorkerProfile: boolean;
 }) {
   return (
     <article className="rounded-[2rem] border border-primary/20 bg-primary/10 p-6">
       <div className="flex gap-4">
         <AlertCircle className="mt-1 h-5 w-5 shrink-0 text-primary" />
+
         <div>
           <h3 className="font-black">
-            {hireCoreManaged ? "How HireCore review works" : "Application note"}
+            {needsWorkerProfile
+              ? "Worker profile required"
+              : hireCoreManaged
+                ? "How HireCore review works"
+                : "Application note"}
           </h3>
+
           <p className="mt-1 text-sm leading-6 text-muted-foreground">
-            {hireCoreManaged
-              ? "HireCore reviews applications, checks fit, and assigns the most suitable worker. Strong applicants may later be invited into the verified workforce."
-              : "You need a worker profile before applying. HireCore uses worker profiles, verification, and trust signals to keep the marketplace safer for everyone."}
+            {needsWorkerProfile
+              ? "You need a worker profile before applying. This helps HireCore understand your skills, location, and fit for local tasks."
+              : hireCoreManaged
+                ? "HireCore reviews applications, checks fit, and assigns the most suitable worker. Strong applicants may later be invited into the verified workforce."
+                : "HireCore uses worker profiles, verification, and trust signals to keep the marketplace safer for everyone."}
           </p>
         </div>
       </div>
@@ -654,11 +712,13 @@ function ApplicationRequirementCard({
 function ApplyCard({
   job,
   authenticated,
+  needsWorkerProfile,
   applyDisabledReason,
   onApply,
 }: {
   job: Job;
   authenticated: boolean;
+  needsWorkerProfile: boolean;
   applyDisabledReason: string | null;
   onApply: () => void;
 }) {
@@ -688,20 +748,32 @@ function ApplyCard({
         onClick={onApply}
         className="mt-6 h-12 w-full rounded-full bg-primary text-primary-foreground shadow-(--glow-primary)"
       >
-        <Send className="mr-2 h-4 w-4" />
+        {needsWorkerProfile ? (
+          <UserRound className="mr-2 h-4 w-4" />
+        ) : (
+          <Send className="mr-2 h-4 w-4" />
+        )}
 
         {!authenticated
           ? "Sign in to apply"
           : hasApplied
             ? "Already applied"
-            : isOpen
-              ? getApplicationLabel(job)
-              : "Closed"}
+            : needsWorkerProfile
+              ? "Create worker profile"
+              : isOpen
+                ? getApplicationLabel(job)
+                : "Closed"}
       </Button>
 
       <div className="mt-3">
         <ShareTaskButton job={job} />
       </div>
+
+      {needsWorkerProfile && authenticated && !applyDisabledReason && (
+        <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">
+          You need a worker profile before applying. It only takes a minute.
+        </p>
+      )}
 
       {applyDisabledReason && authenticated && (
         <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">
@@ -736,6 +808,7 @@ function TaskSourceCard({
           <h3 className="font-black">
             {hireCoreManaged ? "Task source" : "Employer"}
           </h3>
+
           <p className="mt-0.5 text-sm text-muted-foreground">
             {hireCoreManaged ? "Posted by HireCore Local" : employerName}
           </p>
