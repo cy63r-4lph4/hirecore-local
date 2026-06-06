@@ -32,7 +32,7 @@ import {
   updateBaseProfile,
   updateEmployerProfile,
   updateWorkerProfile,
-  uploadProfileImage,
+  uploadAndSetProfileImage,
 } from "@/lib/api/profile";
 
 type ProfileUpdatePanelProps = {
@@ -253,8 +253,7 @@ export function ProfileUpdatePanel({ user }: ProfileUpdatePanelProps) {
     setUploadingImage(true);
 
     try {
-      const updatedUser = await uploadProfileImage(file);
-
+      const updatedUser = await uploadAndSetProfileImage(file);
       syncUser(updatedUser);
 
       toast({

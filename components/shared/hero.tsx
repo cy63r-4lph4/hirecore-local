@@ -21,6 +21,11 @@ const roles = [
   "electricians",
   "mechanics",
   "local experts",
+  "graphic designers",
+  "photographers",
+  "freelancers",
+  "skilled workers",
+  "software developers",
 ];
 
 function TypewriterText() {

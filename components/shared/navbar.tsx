@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -9,7 +9,6 @@ import {
   BriefcaseBusiness,
   Bug,
   ChevronDown,
-  FileText,
   HelpCircle,
   LayoutDashboard,
   LogOut,
@@ -24,7 +23,11 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
 import { cn, getInitials } from "@/lib/utils";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useAuth } from "@/providers/AuthProvider";
@@ -55,6 +58,21 @@ function useOutsideClick<T extends HTMLElement>(
       document.removeEventListener("pointerdown", handlePointerDown);
     };
   }, [enabled, handler, ref]);
+}
+
+function absoluteImageUrl(url?: string | null) {
+  if (!url) return null;
+
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  const apiBase =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
+
+  const origin = apiBase.replace(/\/api\/?$/, "");
+
+  return `${origin}${url}`;
 }
 
 const publicLinks: NavLink[] = [
@@ -102,6 +120,39 @@ const authedLinks: NavLink[] = [
     icon: Settings,
   },
 ];
+
+function UserAvatar({
+  imageUrl,
+  name,
+  className,
+  fallbackClassName,
+}: {
+  imageUrl?: string | null;
+  name: string;
+  className?: string;
+  fallbackClassName?: string;
+}) {
+  return (
+    <Avatar className={className}>
+      {imageUrl && (
+        <AvatarImage
+          src={imageUrl}
+          alt={name}
+          className="object-cover"
+        />
+      )}
+
+      <AvatarFallback
+        className={cn(
+          "bg-primary font-bold text-primary-foreground",
+          fallbackClassName,
+        )}
+      >
+        {getInitials(name)}
+      </AvatarFallback>
+    </Avatar>
+  );
+}
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -151,6 +202,11 @@ export default function Navbar() {
 
   const userName = user?.fullName || user?.email || "User";
   const userEmail = user?.email || "";
+
+  const profileImageUrl = useMemo(
+    () => absoluteImageUrl(user?.profileImageUrl),
+    [user?.profileImageUrl],
+  );
 
   return (
     <nav
@@ -254,11 +310,12 @@ export default function Navbar() {
                   aria-haspopup="menu"
                   className="flex items-center gap-2 rounded-full border border-border bg-surface-soft py-1 pl-1 pr-3 text-sm text-foreground transition hover:bg-accent hover:text-accent-foreground"
                 >
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-primary text-xs font-bold text-primary-foreground">
-                      {getInitials(userName)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <UserAvatar
+                    imageUrl={profileImageUrl}
+                    name={userName}
+                    className="h-8 w-8"
+                    fallbackClassName="text-xs"
+                  />
 
                   <span className="hidden max-w-28 truncate font-medium lg:block">
                     {userName}
@@ -277,13 +334,22 @@ export default function Navbar() {
                     role="menu"
                     className="absolute right-0 mt-3 w-64 overflow-hidden rounded-2xl border border-border bg-card/95 p-2 text-card-foreground shadow-[0_18px_50px_rgba(0,0,0,0.18)] backdrop-blur-2xl animate-in fade-in zoom-in-95"
                   >
-                    <div className="p-3">
-                      <p className="truncate text-sm font-semibold">
-                        {userName}
-                      </p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {userEmail}
-                      </p>
+                    <div className="flex items-center gap-3 p-3">
+                      <UserAvatar
+                        imageUrl={profileImageUrl}
+                        name={userName}
+                        className="h-10 w-10"
+                        fallbackClassName="text-sm"
+                      />
+
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold">
+                          {userName}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {userEmail}
+                        </p>
+                      </div>
                     </div>
 
                     <div className="my-1 h-px bg-border" />
@@ -334,18 +400,23 @@ export default function Navbar() {
               onClick={() => setMenuOpen((open) => !open)}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface-soft text-foreground transition hover:bg-accent hover:text-accent-foreground"
             >
-              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {menuOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
             </button>
 
             {menuOpen && (
               <div className="absolute left-0 right-0 top-[calc(100%+0.75rem)] rounded-2xl border border-border bg-card/95 p-4 text-card-foreground shadow-[0_18px_50px_rgba(0,0,0,0.18)] backdrop-blur-2xl animate-in fade-in zoom-in-95">
                 {authenticated && (
                   <div className="mb-3 flex items-center gap-3 rounded-2xl border border-border bg-background/70 p-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-primary text-sm font-bold text-primary-foreground">
-                        {getInitials(userName)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <UserAvatar
+                      imageUrl={profileImageUrl}
+                      name={userName}
+                      className="h-10 w-10"
+                      fallbackClassName="text-sm"
+                    />
 
                     <div className="min-w-0 text-left">
                       <p className="truncate text-sm font-semibold">
