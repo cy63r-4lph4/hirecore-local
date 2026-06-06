@@ -5,7 +5,7 @@ import {
   useContext,
   useEffect,
   useState,
-  ReactNode,
+  type ReactNode,
 } from "react";
 
 type Theme = "light" | "dark";
@@ -29,16 +29,13 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
-    const stored = localStorage.getItem("hirecore-theme") as Theme | null;
+    const currentTheme: Theme = document.documentElement.classList.contains(
+      "dark",
+    )
+      ? "dark"
+      : "light";
 
-    const resolvedTheme: Theme =
-      stored === "light" || stored === "dark"
-        ? stored
-        : window.matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light";
-
-    setTheme(resolvedTheme);
+    setTheme(currentTheme);
     setMounted(true);
   }, []);
 
@@ -46,7 +43,10 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     if (!mounted) return;
 
     const root = document.documentElement;
+
     root.classList.toggle("dark", theme === "dark");
+    root.style.colorScheme = theme;
+
     localStorage.setItem("hirecore-theme", theme);
   }, [theme, mounted]);
 

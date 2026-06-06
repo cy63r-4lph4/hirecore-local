@@ -64,6 +64,25 @@ export const metadata: Metadata = {
   },
 };
 
+const themeScript = `
+(function () {
+  try {
+    var stored = localStorage.getItem("hirecore-theme");
+    var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    var theme =
+      stored === "light" || stored === "dark"
+        ? stored
+        : prefersDark
+          ? "dark"
+          : "light";
+
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    document.documentElement.style.colorScheme = theme;
+  } catch (_) {}
+})();
+`;
+
 export default function RootLayout({
   children,
 }: {
@@ -75,6 +94,10 @@ export default function RootLayout({
       className={cn("font-sans", geist.variable, inter.variable)}
       suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+
       <body className="min-h-screen bg-background font-sans text-foreground antialiased selection:bg-primary/20 selection:text-primary-foreground">
         <ThemeProvider>
           <AuthProvider>
