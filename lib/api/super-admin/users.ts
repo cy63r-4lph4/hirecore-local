@@ -51,6 +51,77 @@ export type AdminUser = {
   updatedAt: string;
 };
 
+export type AdminUserDetail = AdminUser & {
+  workerProfile:
+    | (NonNullable<AdminUser["workerProfile"]> & {
+        workforceApplications: {
+          id: string;
+          status: string;
+          createdAt: string;
+          reviewedAt: string | null;
+        }[];
+        trustEvents: {
+          id: string;
+          source: string;
+          delta: number;
+          previousScore: number;
+          newScore: number;
+          reason: string;
+          createdAt: string;
+        }[];
+      })
+    | null;
+  employerProfile:
+    | (NonNullable<AdminUser["employerProfile"]> & {
+        trustEvents: {
+          id: string;
+          source: string;
+          delta: number;
+          previousScore: number;
+          newScore: number;
+          reason: string;
+          createdAt: string;
+        }[];
+      })
+    | null;
+  jobsPosted: {
+    id: string;
+    title: string;
+    status: string;
+    pay: string;
+    locationName: string;
+    createdAt: string;
+  }[];
+  applications: {
+    id: string;
+    status: string;
+    createdAt: string;
+    job: {
+      id: string;
+      title: string;
+      status: string;
+      pay: string;
+      locationName: string;
+    };
+  }[];
+  uploads: {
+    id: string;
+    purpose: string;
+    originalName: string;
+    mimeType: string;
+    sizeBytes: number;
+    createdAt: string;
+  }[];
+  sessions: {
+    id: string;
+    userAgent: string | null;
+    ipAddress: string | null;
+    createdAt: string;
+    expiresAt: string;
+  }[];
+  verifiedByAdmin: { id: string; fullName: string; email: string } | null;
+};
+
 export type AdminUsersMeta = {
   page: number;
   limit: number;
@@ -92,7 +163,7 @@ export async function getSuperAdminUsers(params?: GetSuperAdminUsersParams) {
 }
 
 export async function getSuperAdminUser(id: string) {
-  const { data } = await api.get<AdminUser>(`/admin/super/users/${id}`);
+  const { data } = await api.get<AdminUserDetail>(`/admin/super/users/${id}`);
   return data;
 }
 

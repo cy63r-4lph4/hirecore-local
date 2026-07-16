@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 export type PublicWorker = {
   id: string;
   fullName: string | null;
+  profileImageUrl?: string | null;
   accountTypes?: string[];
   joinedAt?: string;
   createdAt?: string;
@@ -61,8 +62,16 @@ export function WorkerCard({ worker, className }: WorkerCardProps) {
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-border bg-muted text-base font-black tracking-tight text-foreground">
-            {getInitials(worker.fullName)}
+          <div className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-muted text-base font-black tracking-tight text-foreground">
+            {worker.profileImageUrl ? (
+              <img
+                src={worker.profileImageUrl}
+                alt={worker.fullName || "Worker"}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              getInitials(worker.fullName)
+            )}
           </div>
 
           <div className="min-w-0">

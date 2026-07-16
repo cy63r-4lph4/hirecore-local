@@ -176,8 +176,16 @@ export default function WorkerProfilePage() {
             <div className="rounded-[2rem] border border-border bg-card p-6 shadow-sm sm:p-8">
               <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-center">
-                  <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-[2rem] border border-border bg-muted text-3xl font-black tracking-tight text-foreground">
-                    {getInitials(worker.fullName)}
+                  <div className="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[2rem] border border-border bg-muted text-3xl font-black tracking-tight text-foreground">
+                    {worker.profileImageUrl ? (
+                      <img
+                        src={worker.profileImageUrl}
+                        alt={worker.fullName}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      getInitials(worker.fullName)
+                    )}
                   </div>
 
                   <div className="min-w-0">

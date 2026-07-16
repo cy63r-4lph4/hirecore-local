@@ -6,6 +6,7 @@ import { getPublicProfile } from "@/lib/api/workers";
 export type NormalizedWorkerProfile = {
   id: string;
   fullName: string;
+  profileImageUrl: string | null;
   accountTypes: string[];
 
   bio: string | null;
@@ -36,6 +37,8 @@ function normalizeWorkerProfile(response: any): NormalizedWorkerProfile | null {
   return {
     id: response.id,
     fullName: response.fullName || "Unnamed worker",
+    profileImageUrl: response.profileImageUrl ?? null,
+
     accountTypes: response.accountTypes ?? [],
 
     bio: workerProfile.bio ?? null,
