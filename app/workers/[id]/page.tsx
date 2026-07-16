@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { absoluteImageUrl, cn } from "@/lib/utils";
 import { useWorker } from "@/hooks/useWorker";
 
 function getInitials(name?: string | null) {
@@ -178,14 +178,14 @@ export default function WorkerProfilePage() {
                 <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-center">
                   <div className="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[2rem] border border-border bg-muted text-3xl font-black tracking-tight text-foreground">
                     {worker.profileImageUrl ? (
-                      <img
-                        src={worker.profileImageUrl}
-                        alt={worker.fullName}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      getInitials(worker.fullName)
-                    )}
+  <img
+    src={absoluteImageUrl(worker.profileImageUrl)!}
+    alt={worker.fullName || "Worker"}
+    className="h-full w-full object-cover"
+  />
+) : (
+  getInitials(worker.fullName)
+)}
                   </div>
 
                   <div className="min-w-0">

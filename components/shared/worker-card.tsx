@@ -8,7 +8,7 @@ import {
   UsersRound,
 } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { absoluteImageUrl, cn } from "@/lib/utils";
 
 export type PublicWorker = {
   id: string;
@@ -65,7 +65,7 @@ export function WorkerCard({ worker, className }: WorkerCardProps) {
           <div className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-muted text-base font-black tracking-tight text-foreground">
             {worker.profileImageUrl ? (
               <img
-                src={worker.profileImageUrl}
+                src={absoluteImageUrl(worker.profileImageUrl)!}
                 alt={worker.fullName || "Worker"}
                 className="h-full w-full object-cover"
               />

@@ -55,3 +55,18 @@ export function getApplicationStatusColor(status?: string | null) {
       return "bg-muted text-muted-foreground border-border";
   }
 }
+
+export function absoluteImageUrl(url?: string | null) {
+  if (!url) return null;
+
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  const apiBase =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
+
+  const origin = apiBase.replace(/\/api\/?$/, "");
+
+  return `${origin}${url}`;
+}

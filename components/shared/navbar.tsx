@@ -28,7 +28,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
-import { cn, getInitials } from "@/lib/utils";
+import { absoluteImageUrl, cn, getInitials } from "@/lib/utils";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useAuth } from "@/providers/AuthProvider";
 
@@ -60,20 +60,7 @@ function useOutsideClick<T extends HTMLElement>(
   }, [enabled, handler, ref]);
 }
 
-function absoluteImageUrl(url?: string | null) {
-  if (!url) return null;
 
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    return url;
-  }
-
-  const apiBase =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
-
-  const origin = apiBase.replace(/\/api\/?$/, "");
-
-  return `${origin}${url}`;
-}
 
 const publicLinks: NavLink[] = [
   {
